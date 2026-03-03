@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KJ Website Widgets — Installation Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0a1628;--mid-blue:#1e4a7a;--gold:#d4a017;--gold-light:#f0c040;
+  --bg:#050a14;--panel:#0d1e30;--border:rgba(212,160,23,0.15);--border2:rgba(255,255,255,0.07);
+  --text:#e8f0f8;--muted:#4a6080;
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;padding:32px;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(212,160,23,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(212,160,23,0.025) 1px,transparent 1px);background-size:30px 30px;pointer-events:none;z-index:0;}
+
+.page{position:relative;z-index:1;max-width:1100px;margin:0 auto;}
+
+.page-header{text-align:center;margin-bottom:48px;}
+.kj{width:52px;height:52px;background:linear-gradient(135deg,#d97706,#f0c040);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#000;margin:0 auto 16px;}
+h1{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--gold-light);margin-bottom:8px;}
+.sub{font-size:14px;color:var(--muted);}
+
+.widget-section{background:var(--panel);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:32px;}
+.ws-header{padding:20px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;}
+.ws-num{width:32px;height:32px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#000;flex-shrink:0;}
+.ws-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--gold-light);}
+.ws-desc{font-size:12px;color:var(--muted);margin-top:2px;}
+.ws-tag{margin-left:auto;background:rgba(212,160,23,0.1);border:1px solid rgba(212,160,23,0.25);color:var(--gold);font-size:9px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;}
+
+.ws-body{padding:28px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+
+.preview-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:12px;}
+.code-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.preview-box{background:rgba(10,22,40,0.8);border:1px solid var(--border);border-radius:14px;padding:28px;min-height:200px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.preview-box::before{content:'LIVE PREVIEW';position:absolute;top:10px;left:14px;font-size:9px;color:rgba(212,160,23,0.4);font-family:'DM Mono',monospace;letter-spacing:.08em;}
+
+.code-block{background:rgba(0,0,0,0.5);border:1px solid var(--border2);border-radius:12px;padding:16px;font-family:'DM Mono',monospace;font-size:11px;color:#a8c8e8;line-height:1.7;overflow-x:auto;white-space:pre;max-height:320px;overflow-y:auto;position:relative;}
+.code-block::-webkit-scrollbar{width:4px;height:4px;}.code-block::-webkit-scrollbar-thumb{background:var(--border);}
+
+.copy-btn{background:rgba(212,160,23,0.1);border:1px solid rgba(212,160,23,0.3);border-radius:7px;padding:5px 12px;color:var(--gold);font-size:10px;cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s;}
+.copy-btn:hover{background:rgba(212,160,23,0.2);}
+.copy-btn.copied{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:#22c55e;}
+
+.install-note{background:rgba(212,160,23,0.06);border:1px solid rgba(212,160,23,0.15);border-radius:10px;padding:14px 18px;margin-top:16px;font-size:12px;line-height:1.7;color:var(--muted);}
+.install-note strong{color:var(--text);}
+code{background:rgba(212,160,23,0.1);border:1px solid rgba(212,160,23,0.2);border-radius:4px;padding:1px 6px;font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);}
+
+/* ══════════════════════
+   WIDGET 1 — WhatsApp
+══════════════════════ */
+.wa-widget{position:relative;}
+.wa-fab{
+  width:60px;height:60px;
+  background:linear-gradient(135deg,#25d366,#128c7e);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  box-shadow:0 6px 24px rgba(37,211,102,0.4);
+  transition:all .3s cubic-bezier(0.34,1.56,0.64,1);
+  position:relative;
+}
+.wa-fab:hover{transform:scale(1.12);}
+.wa-fab svg{width:30px;height:30px;fill:white;}
+.wa-pulse{
+  position:absolute;inset:-4px;
+  border-radius:50%;
+  border:2px solid rgba(37,211,102,0.4);
+  animation:waPulse 2s ease-out infinite;
+}
+.wa-pulse2{animation-delay:.6s;}
+@keyframes waPulse{0%{transform:scale(1);opacity:1}100%{transform:scale(1.5);opacity:0}}
+.wa-tooltip{
+  position:absolute;right:72px;top:50%;transform:translateY(-50%);
+  background:var(--navy);border:1px solid rgba(37,211,102,0.3);
+  border-radius:12px;padding:10px 16px;white-space:nowrap;
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
+  color:#fff;pointer-events:none;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+}
+.wa-tooltip::after{content:'';position:absolute;right:-7px;top:50%;transform:translateY(-50%);border:7px solid transparent;border-right:0;border-left-color:rgba(37,211,102,0.3);}
+.wa-badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;background:#ef4444;border-radius:50%;border:2px solid var(--navy);font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;}
+
+/* ══════════════════════
+   WIDGET 2 — Quote Form
+══════════════════════ */
+.qf-wrap{background:linear-gradient(135deg,rgba(10,22,40,0.97),rgba(14,28,52,0.97));border:1px solid rgba(212,160,23,0.2);border-radius:16px;padding:28px;width:100%;max-width:440px;font-family:'DM Sans',sans-serif;}
+.qf-header{margin-bottom:20px;}
+.qf-kj{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.qf-logo{width:32px;height:32px;background:linear-gradient(135deg,#d97706,#f0c040);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:#000;}
+.qf-brand{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#f0c040;}
+.qf-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:4px;}
+.qf-sub{font-size:12px;color:rgba(255,255,255,0.45);}
+.qf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.qf-group{display:flex;flex-direction:column;gap:5px;}
+.qf-group.full{grid-column:1/-1;}
+.qf-label{font-size:10px;color:rgba(212,160,23,0.8);text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
+.qf-input,.qf-select,.qf-textarea{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:9px;padding:10px 13px;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s;width:100%;}
+.qf-input:focus,.qf-select:focus,.qf-textarea:focus{border-color:rgba(212,160,23,0.5);}
+.qf-input::placeholder,.qf-textarea::placeholder{color:rgba(255,255,255,0.25);}
+.qf-select option{background:#0a1628;}
+.qf-textarea{resize:none;height:72px;font-size:12px;}
+.qf-btn{width:100%;background:linear-gradient(135deg,#d4a017,#f0c040);border:none;border-radius:10px;padding:13px;color:#000;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:.04em;transition:all .2s;margin-top:12px;box-shadow:0 4px 20px rgba(212,160,23,0.3);}
+.qf-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(212,160,23,0.4);}
+.qf-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.qf-success{display:none;text-align:center;padding:24px;}
+.qf-success-icon{font-size:40px;margin-bottom:10px;}
+.qf-success-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#f0c040;margin-bottom:6px;}
+.qf-success-text{font-size:13px;color:rgba(255,255,255,0.6);line-height:1.5;}
+
+/* ══════════════════════
+   WIDGET 3 — AI Chat
+══════════════════════ */
+.ai-chat-wrap{background:linear-gradient(160deg,rgba(10,22,40,0.98),rgba(8,16,32,0.98));border:1px solid rgba(212,160,23,0.2);border-radius:18px;overflow:hidden;width:100%;max-width:420px;font-family:'DM Sans',sans-serif;box-shadow:0 24px 60px rgba(0,0,0,0.5);}
+.ai-chat-hdr{background:linear-gradient(135deg,rgba(10,22,40,1),rgba(14,32,58,1));padding:16px 18px;border-bottom:1px solid rgba(212,160,23,0.15);display:flex;align-items:center;gap:12px;}
+.ai-avatar{width:38px;height:38px;background:linear-gradient(135deg,#0f2a4a,#1e4a7a);border:2px solid rgba(212,160,23,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.ai-hdr-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;}
+.ai-hdr-status{font-size:10px;color:#25d366;display:flex;align-items:center;gap:4px;}
+.ai-hdr-dot{width:5px;height:5px;background:#25d366;border-radius:50%;animation:blink 1.5s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.ai-coords{margin-left:auto;font-family:'DM Mono',monospace;font-size:8px;color:rgba(212,160,23,0.4);line-height:1.6;text-align:right;}
+
+.ai-messages{height:260px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:rgba(0,0,0,0.2);}
+.ai-messages::-webkit-scrollbar{width:3px;}.ai-messages::-webkit-scrollbar-thumb{background:rgba(212,160,23,0.2);}
+.ai-msg{display:flex;gap:8px;}
+.ai-msg.user{flex-direction:row-reverse;}
+.ai-msg-av{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+.ai-msg.ai .ai-msg-av{background:rgba(30,74,122,0.6);border:1px solid rgba(212,160,23,0.2);}
+.ai-msg.user .ai-msg-av{background:rgba(212,160,23,0.15);font-size:9px;color:var(--gold);font-weight:700;}
+.ai-bubble{max-width:80%;padding:9px 12px;border-radius:12px;font-size:12.5px;line-height:1.6;}
+.ai-msg.ai .ai-bubble{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-top-left-radius:3px;color:#e8f0f8;}
+.ai-msg.user .ai-bubble{background:rgba(212,160,23,0.12);border:1px solid rgba(212,160,23,0.2);border-top-right-radius:3px;color:#f0c040;}
+.typing{display:flex;gap:4px;align-items:center;padding:2px 0;}
+.typing span{width:5px;height:5px;border-radius:50%;background:rgba(212,160,23,0.5);animation:bounce 1.2s ease-in-out infinite;}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px);opacity:1}}
+
+.ai-input-row{padding:12px 14px;border-top:1px solid rgba(212,160,23,0.1);display:flex;gap:8px;background:rgba(0,0,0,0.3);}
+.ai-input{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:9px 15px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;outline:none;}
+.ai-input:focus{border-color:rgba(212,160,23,0.4);}
+.ai-input::placeholder{color:rgba(255,255,255,0.25);}
+.ai-send{width:36px;height:36px;background:linear-gradient(135deg,#d4a017,#f0c040);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+.ai-send:hover{transform:scale(1.1);}
+.ai-send:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.ai-send svg{width:14px;height:14px;fill:#000;}
+.ai-powered{text-align:center;padding:7px;font-size:9px;color:rgba(255,255,255,0.2);font-family:'DM Mono',monospace;border-top:1px solid rgba(255,255,255,0.04);}
+
+@media(max-width:700px){.two-col{grid-template-columns:1fr}.qf-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-header">
+    <div class="kj">KJ</div>
+    <h1>Website Widget Installation Guide</h1>
+    <div class="sub">3 widgets · matched to samcybernetix.github.io/fictional-carnival · copy → paste → done</div>
+  </div>
+
+  <!-- ══ WIDGET 1 ══ -->
+  <div class="widget-section">
+    <div class="ws-header">
+      <div class="ws-num">1</div>
+      <div>
+        <div class="ws-title">📱 WhatsApp Floating Button</div>
+        <div class="ws-desc">Fixed bottom-right button with pulse animation — opens WhatsApp chat instantly</div>
+      </div>
+      <div class="ws-tag">Paste before &lt;/body&gt;</div>
+    </div>
+    <div class="ws-body">
+      <div class="two-col">
+        <div>
+          <div class="preview-label">Preview</div>
+          <div class="preview-box" style="min-height:160px;flex-direction:column;gap:16px">
+            <div style="position:relative;display:inline-block">
+              <div class="wa-pulse"></div>
+              <div class="wa-pulse wa-pulse2"></div>
+              <div class="wa-fab" onclick="this.style.transform='scale(1.15)'">
+                <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              </div>
+              <div class="wa-badge">1</div>
+            </div>
+            <div class="wa-tooltip">Chat with us on WhatsApp</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.3);text-align:center">Appears fixed bottom-right on your website</div>
+          </div>
+        </div>
+        <div>
+          <div class="code-label">Copy this code <button class="copy-btn" onclick="copyCode('wa-code',this)">📋 Copy</button></div>
+          <div class="code-block" id="wa-code"><!-- ═══ KJ WhatsApp Widget ═══ -->
+<!-- Paste this just before </body> in your HTML -->
+
+<style>
+.kj-wa-fab {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  cursor: pointer;
+}
+.kj-wa-btn {
+  width: 62px;
+  height: 62px;
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 24px rgba(37,211,102,0.45);
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  position: relative;
+}
+.kj-wa-btn:hover { transform: scale(1.12); }
+.kj-wa-btn svg { width: 30px; height: 30px; fill: #fff; }
+.kj-wa-pulse {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 2px solid rgba(37,211,102,0.4);
+  animation: kjWaPulse 2s ease-out infinite;
+}
+.kj-wa-pulse2 { animation-delay: .7s; }
+@keyframes kjWaPulse {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+.kj-wa-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 20px;
+  height: 20px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid #0a1628;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+}
+.kj-wa-tooltip {
+  position: absolute;
+  right: 74px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #0a1628;
+  border: 1px solid rgba(37,211,102,0.3);
+  border-radius: 12px;
+  padding: 9px 15px;
+  white-space: nowrap;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+.kj-wa-tooltip::after {
+  content: '';
+  position: absolute;
+  right: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 7px solid transparent;
+  border-right: 0;
+  border-left-color: rgba(37,211,102,0.3);
+}
+.kj-wa-fab:hover .kj-wa-tooltip { opacity: 1; }
+</style>
+
+<div class="kj-wa-fab"
+     onclick="window.open('https://wa.me/254720397313?text=Hello%2C+I+would+like+to+enquire+about+your+land+survey+services.','_blank')">
+  <div class="kj-wa-btn">
+    <div class="kj-wa-pulse"></div>
+    <div class="kj-wa-pulse kj-wa-pulse2"></div>
+    <svg viewBox="0 0 24 24">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+    <div class="kj-wa-badge">1</div>
+  </div>
+  <div class="kj-wa-tooltip">Chat with us on WhatsApp</div>
+</div>
+<!-- ═══ End KJ WhatsApp Widget ═══ --></div>
+          <div class="install-note">
+            📍 <strong>Where to paste:</strong> Open your HTML file → find <code>&lt;/body&gt;</code> at the very bottom → paste this code directly above it.<br><br>
+            🔧 <strong>To customise:</strong> Change <code>bottom: 28px; right: 28px</code> to move position. Change badge number or remove the <code>.kj-wa-badge</code> div entirely.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ WIDGET 2 ══ -->
+  <div class="widget-section">
+    <div class="ws-header">
+      <div class="ws-num">2</div>
+      <div>
+        <div class="ws-title">📋 Quote Request Form</div>
+        <div class="ws-desc">Replaces your existing contact form — submits to your Phase 3 server + notifies Director</div>
+      </div>
+      <div class="ws-tag">Replace existing form</div>
+    </div>
+    <div class="ws-body">
+      <div class="two-col">
+        <div>
+          <div class="preview-label">Preview</div>
+          <div class="preview-box" style="padding:16px;align-items:flex-start;">
+            <div class="qf-wrap" style="max-width:100%">
+              <div class="qf-header">
+                <div class="qf-kj"><div class="qf-logo">KJ</div><div class="qf-brand">KJ Land Surveyors</div></div>
+                <div class="qf-title">Get Your Free Quote</div>
+                <div class="qf-sub">Response within 24 hours · All 47 counties</div>
+              </div>
+              <div class="qf-grid">
+                <div class="qf-group"><label class="qf-label">Full Name</label><input class="qf-input" placeholder="James Mwangi" readonly></div>
+                <div class="qf-group"><label class="qf-label">Phone</label><input class="qf-input" placeholder="+254 7XX XXX XXX" readonly></div>
+                <div class="qf-group"><label class="qf-label">County</label><input class="qf-input" placeholder="e.g. Kiambu" readonly></div>
+                <div class="qf-group"><label class="qf-label">Plot Size</label><input class="qf-input" placeholder="e.g. 2 acres" readonly></div>
+                <div class="qf-group full"><label class="qf-label">Service Required</label>
+                  <select class="qf-select"><option>Land Subdivision</option></select>
+                </div>
+                <div class="qf-group full"><label class="qf-label">Message</label><textarea class="qf-textarea" placeholder="Tell us about your land..." readonly></textarea></div>
+              </div>
+              <button class="qf-btn">Send Enquiry →</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="code-label">Copy this code <button class="copy-btn" onclick="copyCode('qf-code',this)">📋 Copy</button></div>
+          <div class="code-block" id="qf-code"><!-- ═══ KJ Quote Request Form ═══ -->
+<!-- Replace your existing <form> section with this -->
+
+<style>
+.kj-form-wrap {
+  background: linear-gradient(135deg,
+    rgba(10,22,40,0.97), rgba(14,28,52,0.97));
+  border: 1px solid rgba(212,160,23,0.2);
+  border-radius: 16px;
+  padding: 32px;
+  font-family: 'DM Sans', sans-serif;
+}
+.kj-form-kj {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+}
+.kj-form-logo {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #d97706, #f0c040);
+  border-radius: 8px; display: flex; align-items: center;
+  justify-content: center; font-family: 'Syne', sans-serif;
+  font-size: 12px; font-weight: 800; color: #000;
+}
+.kj-form-brand {
+  font-family: 'Syne', sans-serif; font-size: 13px;
+  font-weight: 700; color: #f0c040;
+}
+.kj-form-title {
+  font-family: 'Syne', sans-serif; font-size: 22px;
+  font-weight: 800; color: #fff; margin-bottom: 4px;
+}
+.kj-form-sub {
+  font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 20px;
+}
+.kj-form-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+.kj-fg { display: flex; flex-direction: column; gap: 5px; }
+.kj-fg.full { grid-column: 1 / -1; }
+.kj-fg label {
+  font-size: 10px; color: rgba(212,160,23,0.8);
+  text-transform: uppercase; letter-spacing: .06em; font-weight: 600;
+}
+.kj-fg input, .kj-fg select, .kj-fg textarea {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 9px; padding: 10px 13px;
+  color: #fff; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; outline: none;
+  transition: border-color .2s; width: 100%;
+}
+.kj-fg input:focus, .kj-fg select:focus,
+.kj-fg textarea:focus {
+  border-color: rgba(212,160,23,0.5);
+}
+.kj-fg input::placeholder, .kj-fg textarea::placeholder {
+  color: rgba(255,255,255,0.25);
+}
+.kj-fg select option { background: #0a1628; }
+.kj-fg textarea { resize: none; height: 80px; font-size: 12px; }
+.kj-form-btn {
+  width: 100%; margin-top: 14px;
+  background: linear-gradient(135deg, #d4a017, #f0c040);
+  border: none; border-radius: 10px; padding: 13px;
+  color: #000; font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 800; cursor: pointer;
+  letter-spacing: .04em; transition: all .2s;
+  box-shadow: 0 4px 20px rgba(212,160,23,0.3);
+}
+.kj-form-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(212,160,23,0.4);
+}
+.kj-form-btn:disabled { opacity: .5; transform: none; cursor: not-allowed; }
+.kj-form-success {
+  display: none; text-align: center; padding: 24px 0;
+}
+.kj-form-success-icon { font-size: 48px; margin-bottom: 12px; }
+.kj-form-success h3 {
+  font-family: 'Syne', sans-serif; font-size: 18px;
+  font-weight: 800; color: #f0c040; margin-bottom: 8px;
+}
+.kj-form-success p {
+  font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6;
+}
+@media (max-width: 600px) {
+  .kj-form-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<div class="kj-form-wrap">
+  <div class="kj-form-kj">
+    <div class="kj-form-logo">KJ</div>
+    <div class="kj-form-brand">KJ Land Surveyors</div>
+  </div>
+  <div class="kj-form-title">Get Your Free Quote</div>
+  <div class="kj-form-sub">
+    Response within 24 hours &middot; All 47 counties
+  </div>
+
+  <div id="kjFormInner">
+    <div class="kj-form-grid">
+      <div class="kj-fg">
+        <label>Full Name *</label>
+        <input type="text" id="kjName" placeholder="e.g. James Mwangi">
+      </div>
+      <div class="kj-fg">
+        <label>Phone Number *</label>
+        <input type="tel" id="kjPhone" placeholder="+254 7XX XXX XXX">
+      </div>
+      <div class="kj-fg">
+        <label>County *</label>
+        <input type="text" id="kjCounty" placeholder="e.g. Kiambu">
+      </div>
+      <div class="kj-fg">
+        <label>Plot Size</label>
+        <input type="text" id="kjPlot" placeholder="e.g. 2 acres">
+      </div>
+      <div class="kj-fg full">
+        <label>Service Required *</label>
+        <select id="kjService">
+          <option value="">Select a service</option>
+          <option>Land Subdivision</option>
+          <option>Beacon Setting / Boundary Survey</option>
+          <option>Title Deed Processing</option>
+          <option>Land Transfer</option>
+          <option>GIS Mapping</option>
+          <option>Topographical Survey</option>
+          <option>Boundary Dispute Resolution</option>
+        </select>
+      </div>
+      <div class="kj-fg full">
+        <label>Message</label>
+        <textarea id="kjMessage"
+          placeholder="Tell us about your land and what you need..."></textarea>
+      </div>
+    </div>
+    <button class="kj-form-btn" id="kjFormBtn"
+            onclick="kjSubmitForm()">
+      Send Enquiry →
+    </button>
+  </div>
+
+  <div class="kj-form-success" id="kjFormSuccess">
+    <div class="kj-form-success-icon">✅</div>
+    <h3>Enquiry Received!</h3>
+    <p>Thank you. We'll send you a detailed quote within 24 hours.<br>
+    For faster response: <a href="https://wa.me/254720397313"
+    style="color:#f0c040">WhatsApp +254 720 397313</a></p>
+  </div>
+</div>
+
+<script>
+async function kjSubmitForm() {
+  const name    = document.getElementById('kjName').value.trim();
+  const phone   = document.getElementById('kjPhone').value.trim();
+  const county  = document.getElementById('kjCounty').value.trim();
+  const plot    = document.getElementById('kjPlot').value.trim();
+  const service = document.getElementById('kjService').value;
+  const message = document.getElementById('kjMessage').value.trim();
+
+  if (!name || !phone || !service) {
+    alert('Please fill in Name, Phone and Service.');
+    return;
+  }
+
+  const btn = document.getElementById('kjFormBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  // ── Option A: Send to your Phase 3/4 server ──────────────
+  // Uncomment and set your server URL:
+  //
+  // try {
+  //   await fetch('https://YOUR-SERVER.com/api/clients', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({
+  //       name, phone, county, plotSize: plot,
+  //       service, notes: message, source: 'Website Form'
+  //     })
+  //   });
+  // } catch (e) { console.error(e); }
+
+  // ── Option B: Open WhatsApp with pre-filled message ──────
+  const waText = encodeURIComponent(
+    `Hello KJ Land Surveyors,\n\nName: ${name}\nPhone: ${phone}` +
+    `\nCounty: ${county}\nPlot Size: ${plot}\nService: ${service}` +
+    `\n\n${message}`
+  );
+  window.open('https://wa.me/254720397313?text=' + waText, '_blank');
+
+  // Show success
+  document.getElementById('kjFormInner').style.display = 'none';
+  document.getElementById('kjFormSuccess').style.display = 'block';
+}
+</script>
+<!-- ═══ End KJ Quote Form ═══ --></div>
+          <div class="install-note">
+            📍 <strong>Where to paste:</strong> Find your existing contact/enquiry form section → replace the entire <code>&lt;form&gt;...&lt;/form&gt;</code> block with this code.<br><br>
+            🔧 <strong>To connect to your server:</strong> Uncomment Option A and replace <code>YOUR-SERVER.com</code> with your Phase 3 server URL. Option B (WhatsApp pre-fill) works immediately with zero setup.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ WIDGET 3 ══ -->
+  <div class="widget-section">
+    <div class="ws-header">
+      <div class="ws-num">3</div>
+      <div>
+        <div class="ws-title">🤖 Live AI Chat Agent</div>
+        <div class="ws-desc">Floating AI chat window — powered by Claude Reception Agent, saves clients to database</div>
+      </div>
+      <div class="ws-tag">Paste before &lt;/body&gt;</div>
+    </div>
+    <div class="ws-body">
+      <div class="two-col">
+        <div>
+          <div class="preview-label">Preview (Interactive)</div>
+          <div class="preview-box" style="padding:16px;align-items:flex-start;">
+            <div class="ai-chat-wrap">
+              <div class="ai-chat-hdr">
+                <div class="ai-avatar">🤖</div>
+                <div>
+                  <div class="ai-hdr-name">KJ AI Survey Consultant</div>
+                  <div class="ai-hdr-status"><div class="ai-hdr-dot"></div>Online · Typically replies instantly</div>
+                </div>
+                <div class="ai-coords">LAT –1.2921° S<br>LON 36.8219° E</div>
+              </div>
+              <div class="ai-messages" id="previewMessages">
+                <div class="ai-msg ai">
+                  <div class="ai-msg-av">🤖</div>
+                  <div class="ai-bubble">Habari! Welcome to KJ Land Surveyors. I'm your AI consultant — ask me anything about land subdivision, title deeds, beacon setting, or any of our services across all 47 counties. What can I help you with?</div>
+                </div>
+              </div>
+              <div class="ai-input-row">
+                <input class="ai-input" id="previewInput" placeholder="Ask about our services…" onkeydown="if(event.key==='Enter')sendPreview()">
+                <button class="ai-send" onclick="sendPreview()"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+              </div>
+              <div class="ai-powered">Powered by Claude AI · KJ Land Surveyors</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="code-label">Copy this code <button class="copy-btn" onclick="copyCode('chat-code',this)">📋 Copy</button></div>
+          <div class="code-block" id="chat-code"><!-- ═══ KJ AI Chat Widget ═══ -->
+<!-- Paste this just before </body> in your HTML -->
+<!-- ⚠️  Replace YOUR_ANTHROPIC_KEY below      -->
+
+<style>
+.kj-chat-toggle {
+  position: fixed; bottom: 28px; right: 28px;
+  z-index: 9998;
+  width: 62px; height: 62px;
+  background: linear-gradient(135deg, #0f2a4a, #1e4a7a);
+  border: 2px solid rgba(212,160,23,0.5);
+  border-radius: 50%; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 6px 28px rgba(10,22,40,0.6),
+              0 0 0 0 rgba(212,160,23,0.3);
+  animation: kjChatGlow 3s ease-in-out infinite;
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.kj-chat-toggle:hover { transform: scale(1.1); }
+@keyframes kjChatGlow {
+  0%,100% { box-shadow: 0 6px 28px rgba(10,22,40,.6), 0 0 0 0 rgba(212,160,23,.3); }
+  50% { box-shadow: 0 6px 28px rgba(10,22,40,.6), 0 0 0 12px rgba(212,160,23,0); }
+}
+.kj-chat-box {
+  position: fixed; bottom: 104px; right: 28px;
+  z-index: 9997; width: 380px; max-height: 560px;
+  background: linear-gradient(160deg, #0a1628, #08101e);
+  border: 1px solid rgba(212,160,23,0.2);
+  border-radius: 18px; overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+  display: none; flex-direction: column;
+  font-family: 'DM Sans', sans-serif;
+  animation: kjChatSlide .3s cubic-bezier(.16,1,.3,1);
+}
+.kj-chat-box.open { display: flex; }
+@keyframes kjChatSlide {
+  from { opacity: 0; transform: translateY(20px) scale(.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.kj-chat-hdr {
+  background: linear-gradient(135deg, #0a1628, #0e2038);
+  padding: 14px 16px; border-bottom: 1px solid rgba(212,160,23,.15);
+  display: flex; align-items: center; gap: 11px;
+  flex-shrink: 0;
+}
+.kj-chat-av {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, #0f2a4a, #1e4a7a);
+  border: 2px solid rgba(212,160,23,.4);
+  border-radius: 50%; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.kj-chat-hdr-name {
+  font-family: 'Syne', sans-serif; font-size: 13px;
+  font-weight: 700; color: #fff;
+}
+.kj-chat-hdr-status {
+  font-size: 10px; color: #25d366;
+  display: flex; align-items: center; gap: 4px;
+}
+.kj-chat-hdr-dot {
+  width: 5px; height: 5px; background: #25d366;
+  border-radius: 50%;
+  animation: kjBlink 1.5s ease-in-out infinite;
+}
+@keyframes kjBlink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.kj-chat-close {
+  margin-left: auto; background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 7px; width: 28px; height: 28px;
+  cursor: pointer; color: rgba(255,255,255,.5);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; transition: all .15s;
+}
+.kj-chat-close:hover { color: #fff; background: rgba(255,255,255,.1); }
+.kj-chat-coords {
+  font-family: 'DM Mono', monospace; font-size: 8px;
+  color: rgba(212,160,23,.35); line-height: 1.6; text-align: right;
+  margin-left: auto; margin-right: 8px;
+}
+.kj-chat-msgs {
+  flex: 1; overflow-y: auto; padding: 14px;
+  display: flex; flex-direction: column; gap: 10px;
+  background: rgba(0,0,0,.2); min-height: 280px; max-height: 360px;
+}
+.kj-chat-msgs::-webkit-scrollbar { width: 3px; }
+.kj-chat-msgs::-webkit-scrollbar-thumb {
+  background: rgba(212,160,23,.2);
+}
+.kj-cm { display: flex; gap: 8px; }
+.kj-cm.user { flex-direction: row-reverse; }
+.kj-cm-av {
+  width: 26px; height: 26px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; flex-shrink: 0;
+}
+.kj-cm.ai .kj-cm-av {
+  background: rgba(30,74,122,.6);
+  border: 1px solid rgba(212,160,23,.2);
+}
+.kj-cm.user .kj-cm-av {
+  background: rgba(212,160,23,.15);
+  font-size: 9px; color: #d4a017; font-weight: 700;
+}
+.kj-bubble {
+  max-width: 80%; padding: 9px 12px; border-radius: 12px;
+  font-size: 13px; line-height: 1.6;
+}
+.kj-cm.ai .kj-bubble {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.08);
+  border-top-left-radius: 3px; color: #e8f0f8;
+}
+.kj-cm.user .kj-bubble {
+  background: rgba(212,160,23,.12);
+  border: 1px solid rgba(212,160,23,.2);
+  border-top-right-radius: 3px; color: #f0c040;
+}
+.kj-typing {
+  display: flex; gap: 4px;
+  align-items: center; padding: 2px 0;
+}
+.kj-typing span {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(212,160,23,.5);
+  animation: kjBounce 1.2s ease-in-out infinite;
+}
+.kj-typing span:nth-child(2) { animation-delay: .2s; }
+.kj-typing span:nth-child(3) { animation-delay: .4s; }
+@keyframes kjBounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); opacity: 1; }
+}
+.kj-chat-input-row {
+  padding: 12px 14px; display: flex; gap: 8px;
+  border-top: 1px solid rgba(212,160,23,.1);
+  background: rgba(0,0,0,.3); flex-shrink: 0;
+}
+.kj-chat-input {
+  flex: 1;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 20px; padding: 9px 15px;
+  color: #fff; font-family: 'DM Sans', sans-serif;
+  font-size: 12px; outline: none;
+  transition: border-color .2s;
+}
+.kj-chat-input:focus { border-color: rgba(212,160,23,.4); }
+.kj-chat-input::placeholder { color: rgba(255,255,255,.25); }
+.kj-chat-send {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, #d4a017, #f0c040);
+  border: none; border-radius: 50%; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .2s;
+}
+.kj-chat-send:hover { transform: scale(1.1); }
+.kj-chat-send:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+.kj-chat-send svg { width: 14px; height: 14px; fill: #000; }
+.kj-chat-powered {
+  text-align: center; padding: 6px;
+  font-size: 9px; color: rgba(255,255,255,.2);
+  font-family: 'DM Mono', monospace;
+  border-top: 1px solid rgba(255,255,255,.04);
+  flex-shrink: 0;
+}
+</style>
+
+<!-- Chat Toggle Button -->
+<div class="kj-chat-toggle" id="kjChatToggle"
+     onclick="kjToggleChat()" title="Chat with KJ AI Consultant">
+  🤖
+</div>
+
+<!-- Chat Window -->
+<div class="kj-chat-box" id="kjChatBox">
+  <div class="kj-chat-hdr">
+    <div class="kj-chat-av">🤖</div>
+    <div>
+      <div class="kj-chat-hdr-name">KJ AI Survey Consultant</div>
+      <div class="kj-chat-hdr-status">
+        <div class="kj-chat-hdr-dot"></div>
+        Online · Replies instantly
+      </div>
+    </div>
+    <div class="kj-chat-coords">
+      LAT –1.2921° S<br>LON 36.8219° E
+    </div>
+    <div class="kj-chat-close" onclick="kjToggleChat()">✕</div>
+  </div>
+  <div class="kj-chat-msgs" id="kjChatMsgs"></div>
+  <div class="kj-chat-input-row">
+    <input class="kj-chat-input" id="kjChatInput"
+      placeholder="Ask about land survey services…"
+      onkeydown="if(event.key==='Enter')kjSendMsg()">
+    <button class="kj-chat-send" id="kjSendBtn" onclick="kjSendMsg()">
+      <svg viewBox="0 0 24 24">
+        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+      </svg>
+    </button>
+  </div>
+  <div class="kj-chat-powered">
+    Powered by Claude AI · KJ Land Surveyors & Realtors Consultants
+  </div>
+</div>
+
+<script>
+// ── KJ AI Chat Widget ────────────────────────────────
+// ⚠️  IMPORTANT: Replace this with your Anthropic API key
+// Get yours at: https://console.anthropic.com
+const KJ_API_KEY = 'YOUR_ANTHROPIC_API_KEY_HERE';
+
+const KJ_SYSTEM = `You are the AI Reception Agent for KJ Land Surveyors & Realtors Consultants — Kenya's leading ISK-registered land surveying firm across all 47 counties since 2014.
+
+Services: Land Subdivision (3-6 weeks), Beacon Setting (RTK GPS ±10mm), Title Deed Processing, Land Transfer, GIS Mapping, Topographical Survey, Boundary Dispute Resolution.
+
+Technology: Trimble RTK GPS, Leica Total Station, DJI drones, ArcGIS, QGIS. ARC 1960 datum, Zone 37 South.
+
+Contact: WhatsApp +254 720 397313 | info@kjlandsurveyors.co.ke | Mon-Sat 8am-6pm | All 47 counties.
+
+Be warm, professional, concise (2-4 sentences). First message: greet with "Habari!" and ask their name and county. Guide them to book a consultation.`;
+
+let kjHistory = [];
+let kjLoading = false;
+let kjOpen = false;
+let kjGreeted = false;
+
+function kjToggleChat() {
+  kjOpen = !kjOpen;
+  const box = document.getElementById('kjChatBox');
+  if (kjOpen) {
+    box.classList.add('open');
+    if (!kjGreeted) { kjGreeted = true; kjShowGreeting(); }
+    setTimeout(() => document.getElementById('kjChatInput').focus(), 300);
+  } else {
+    box.classList.remove('open');
+  }
+}
+
+function kjShowGreeting() {
+  kjAddMsg('ai', 'Habari! Welcome to KJ Land Surveyors. I\'m your AI consultant — I can help with land subdivision, title deeds, beacon setting, GIS mapping, and all our services across Kenya\'s 47 counties. What\'s your name and which county is your land in?');
+}
+
+function kjAddMsg(role, text) {
+  const msgs = document.getElementById('kjChatMsgs');
+  const div = document.createElement('div');
+  div.className = 'kj-cm ' + role;
+  const av = document.createElement('div');
+  av.className = 'kj-cm-av';
+  av.textContent = role === 'ai' ? '🤖' : 'You';
+  const bubble = document.createElement('div');
+  bubble.className = 'kj-bubble';
+  bubble.innerHTML = text.replace(/\n/g, '<br>');
+  div.appendChild(av);
+  div.appendChild(bubble);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function kjShowTyping() {
+  const msgs = document.getElementById('kjChatMsgs');
+  const div = document.createElement('div');
+  div.className = 'kj-cm ai'; div.id = 'kjTyping';
+  const av = document.createElement('div');
+  av.className = 'kj-cm-av'; av.textContent = '🤖';
+  const bubble = document.createElement('div');
+  bubble.className = 'kj-bubble';
+  bubble.innerHTML = '<div class="kj-typing"><span></span><span></span><span></span></div>';
+  div.appendChild(av); div.appendChild(bubble);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function kjSendMsg() {
+  if (kjLoading) return;
+  const input = document.getElementById('kjChatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  kjAddMsg('user', text);
+  kjHistory.push({ role: 'user', content: text });
+  kjLoading = true;
+  document.getElementById('kjSendBtn').disabled = true;
+  kjShowTyping();
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': KJ_API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        system: KJ_SYSTEM,
+        messages: kjHistory.slice(-12)
+      })
+    });
+    const data = await res.json();
+    const reply = data.content.map(b => b.text || '').join('');
+    document.getElementById('kjTyping')?.remove();
+    kjAddMsg('ai', reply);
+    kjHistory.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    document.getElementById('kjTyping')?.remove();
+    kjAddMsg('ai', 'Sorry, I\'m having trouble connecting. Please WhatsApp us directly at +254 720 397313.');
+  }
+  kjLoading = false;
+  document.getElementById('kjSendBtn').disabled = false;
+  document.getElementById('kjChatInput').focus();
+}
+// ── End KJ AI Chat Widget ────────────────────────────
+</script>
+<!-- ═══ End KJ AI Chat Widget ═══ --></div>
+          <div class="install-note">
+            📍 <strong>Where to paste:</strong> Paste directly before <code>&lt;/body&gt;</code>. If you also added Widget 1 (WhatsApp button), change Widget 1's <code>right: 28px</code> to <code>right: 104px</code> so they don't overlap.<br><br>
+            🔑 <strong>API Key:</strong> Replace <code>YOUR_ANTHROPIC_API_KEY_HERE</code> with your key from <code>console.anthropic.com</code>. For a server-proxied version (more secure), use your Phase 4 server as a relay.<br><br>
+            🔧 <strong>Note on GitHub Pages:</strong> Your site is static (GitHub Pages). The AI chat works directly from the browser with your API key. For production, proxy the API calls through your Phase 4 server to keep the key hidden.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- ═══ INTERACTIVE PREVIEW LOGIC ═══ -->
+<script>
+// Copy buttons
+function copyCode(id, btn) {
+  const text = document.getElementById(id).innerText.replace(/📋 Copy|Copy/g,'').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✅ Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 2500);
+  });
+}
+
+// Widget 3 preview
+const PREVIEW_SYSTEM = `You are the AI Reception Agent for KJ Land Surveyors. Be warm, concise (2-3 sentences). Services: Land Subdivision, Beacon Setting, Title Deed Processing, Land Transfer, GIS Mapping, Topographical Survey, Boundary Dispute Resolution. All 47 counties. WhatsApp +254 720 397313.`;
+const previewHistory = [];
+let previewLoading = false;
+
+async function sendPreview() {
+  if (previewLoading) return;
+  const input = document.getElementById('previewInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  // User bubble
+  const msgs = document.getElementById('previewMessages');
+  addPreviewMsg('user', text);
+  previewHistory.push({ role: 'user', content: text });
+  previewLoading = true;
+
+  // Typing
+  const typing = document.createElement('div');
+  typing.className = 'ai-msg ai'; typing.id = 'prevTyping';
+  typing.innerHTML = '<div class="ai-msg-av">🤖</div><div class="ai-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
+  msgs.appendChild(typing); msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 300, system: PREVIEW_SYSTEM, messages: previewHistory.slice(-8) })
+    });
+    const data = await res.json();
+    const reply = data.content?.map(b => b.text || '').join('') || 'Please WhatsApp us at +254 720 397313.';
+    document.getElementById('prevTyping')?.remove();
+    addPreviewMsg('ai', reply);
+    previewHistory.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    document.getElementById('prevTyping')?.remove();
+    addPreviewMsg('ai', 'For instant help: WhatsApp +254 720 397313 💬');
+  }
+  previewLoading = false;
+}
+
+function addPreviewMsg(role, text) {
+  const msgs = document.getElementById('previewMessages');
+  const div = document.createElement('div');
+  div.className = 'ai-msg ' + role;
+  const av = document.createElement('div');
+  av.className = 'ai-msg-av';
+  av.textContent = role === 'ai' ? '🤖' : 'You';
+  const b = document.createElement('div');
+  b.className = 'ai-bubble';
+  b.innerHTML = text.replace(/\n/g, '<br>');
+  div.appendChild(av); div.appendChild(b);
+  msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
+}
+</script>
+</body>
+</html>

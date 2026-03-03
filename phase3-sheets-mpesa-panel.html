@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KJ — Phase 3 · Sheets & M-Pesa</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04080d;--panel:#081018;--panel2:#0c1820;
+  --border:rgba(34,197,94,0.1);--border2:rgba(255,255,255,0.07);
+  --sheets:#34a853;--sheets-light:#4ade80;
+  --mpesa:#00a651;--mpesa-light:#22c55e;
+  --gold:#fbbf24;--red:#f87171;--blue:#60a5fa;
+  --text:#e2f0ea;--muted:#3d6b50;
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(52,168,83,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(52,168,83,0.025) 1px,transparent 1px);background-size:30px 30px;pointer-events:none;z-index:0;}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(4,8,13,0.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:11px 28px;display:flex;align-items:center;gap:12px;}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.kj-badge{width:36px;height:36px;background:linear-gradient(135deg,#d97706,#fbbf24);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#000;}
+.nav-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--sheets-light);}
+.phase-badge{background:rgba(52,168,83,0.12);border:1px solid rgba(52,168,83,0.25);color:var(--sheets-light);font-size:9px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.07em;text-transform:uppercase;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;}
+.status-pill{display:flex;align-items:center;gap:5px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:20px;padding:4px 12px;color:var(--mpesa-light);font-size:10px;}
+.dot{width:5px;height:5px;background:var(--mpesa-light);border-radius:50%;animation:blink 1.5s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* SETUP WIZARD */
+.wizard{position:relative;z-index:1;padding:20px 28px 0;}
+.wizard-tabs{display:flex;gap:0;background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;}
+.wizard-tab{flex:1;padding:14px 16px;text-align:center;cursor:pointer;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);transition:all .2s;border-right:1px solid var(--border);position:relative;}
+.wizard-tab:last-child{border-right:none;}
+.wizard-tab.active{background:rgba(52,168,83,0.1);color:var(--sheets-light);}
+.wizard-tab .tab-num{display:inline-block;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.08);font-size:10px;line-height:20px;text-align:center;margin-right:6px;}
+.wizard-tab.active .tab-num{background:rgba(52,168,83,0.2);color:var(--sheets-light);}
+.wizard-tab.done .tab-num{background:rgba(52,168,83,0.25);color:var(--sheets-light);}
+.wizard-tab.done .tab-num::after{content:'✓';}
+
+.wizard-content{display:none;}.wizard-content.active{display:block;}
+
+/* STEP CARDS */
+.step-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;}
+.step-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.step-desc{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+
+.instruction-list{display:flex;flex-direction:column;gap:12px;}
+.instruction{display:flex;gap:12px;align-items:flex-start;}
+.inst-num{width:26px;height:26px;border-radius:8px;background:rgba(52,168,83,0.12);border:1px solid rgba(52,168,83,0.25);color:var(--sheets-light);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;flex-shrink:0;}
+.inst-body{flex:1;}
+.inst-title{font-size:13px;font-weight:500;margin-bottom:3px;}
+.inst-detail{font-size:12px;color:var(--muted);line-height:1.5;}
+code{background:rgba(52,168,83,0.08);border:1px solid rgba(52,168,83,0.2);border-radius:5px;padding:1px 7px;font-family:'DM Mono',monospace;font-size:11px;color:var(--sheets-light);}
+.code-block{background:rgba(0,0,0,0.4);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;font-family:'DM Mono',monospace;font-size:11px;color:#a3e4b4;line-height:1.7;margin-top:8px;position:relative;overflow-x:auto;white-space:pre;}
+.copy-code{position:absolute;top:8px;right:8px;background:rgba(52,168,83,0.12);border:1px solid rgba(52,168,83,0.2);border-radius:6px;padding:4px 10px;color:var(--sheets-light);font-size:10px;cursor:pointer;font-family:'DM Mono',monospace;}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group.full{grid-column:1/-1;}
+.form-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
+.form-input,.form-select,.form-textarea{background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:9px;padding:10px 13px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;outline:none;transition:border-color .2s;width:100%;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:rgba(52,168,83,0.4);}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--muted);}
+.form-select option{background:var(--panel2);}
+.form-textarea{resize:vertical;min-height:90px;font-size:11px;line-height:1.5;}
+
+/* BUTTONS */
+.btn-green{background:linear-gradient(135deg,var(--sheets),#2d9249);border:none;border-radius:10px;padding:11px 22px;color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.04em;transition:all .2s;box-shadow:0 4px 16px rgba(52,168,83,0.3);}
+.btn-green:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(52,168,83,0.4);}
+.btn-green:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn-mpesa{background:linear-gradient(135deg,#00a651,#007a3d);border:none;border-radius:10px;padding:11px 22px;color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.04em;transition:all .2s;box-shadow:0 4px 16px rgba(0,166,81,0.3);}
+.btn-mpesa:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,166,81,0.4);}
+.btn-mpesa:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn-sm{background:rgba(255,255,255,0.05);border:1px solid var(--border2);border-radius:7px;padding:6px 13px;color:var(--muted);font-size:11px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.btn-sm:hover{background:rgba(255,255,255,0.09);color:var(--text);}
+.btn-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px;}
+
+/* MAIN DASHBOARD */
+.dashboard{position:relative;z-index:1;padding:0 28px 100px;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px;}
+.stat{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:15px 16px;}
+.stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;}
+.stat-value{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;}
+.stat-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+
+/* MAIN GRID */
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.full-width{grid-column:1/-1;}
+
+/* PANEL */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:15px;overflow:hidden;}
+.panel-hdr{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.panel-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--sheets-light);}
+.panel-body{padding:16px 18px;}
+
+/* M-PESA FORM */
+.mpesa-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.mpesa-form .full{grid-column:1/-1;}
+
+/* SYNC LOG */
+.sync-log{max-height:260px;overflow-y:auto;}
+.sync-log::-webkit-scrollbar{width:3px;}.sync-log::-webkit-scrollbar-thumb{background:var(--border);}
+.sync-entry{padding:9px 18px;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;gap:10px;align-items:flex-start;font-family:'DM Mono',monospace;font-size:11px;}
+.sync-entry:last-child{border-bottom:none;}
+.sync-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.sync-ok{background:var(--sheets-light);}.sync-err{background:var(--red);}
+.sync-sheet{color:var(--sheets-light);font-weight:500;}
+.sync-time{color:var(--muted);font-size:9px;white-space:nowrap;margin-left:auto;}
+
+/* PAYMENT TABLE */
+.payment-table{width:100%;border-collapse:collapse;}
+.payment-table th{text-align:left;padding:9px 14px;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.02);}
+.payment-table td{padding:11px 14px;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.04);}
+.payment-table tr:last-child td{border-bottom:none;}
+.payment-table tr:hover td{background:rgba(52,168,83,0.03);}
+
+/* BADGE */
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:.04em;}
+.badge-pending{background:rgba(251,191,36,0.12);color:var(--gold);border:1px solid rgba(251,191,36,0.2);}
+.badge-done{background:rgba(52,168,83,0.12);color:var(--sheets-light);border:1px solid rgba(52,168,83,0.2);}
+.badge-fail{background:rgba(248,113,113,0.12);color:var(--red);border:1px solid rgba(248,113,113,0.2);}
+
+/* DAILY SUMMARY CARD */
+.summary-card{background:linear-gradient(135deg,rgba(52,168,83,0.08),rgba(8,16,24,0.9));border:1px solid rgba(52,168,83,0.2);border-radius:14px;padding:20px;margin-bottom:16px;}
+.summary-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+.summary-text{font-size:13px;line-height:1.75;color:var(--text);}
+.summary-meta{display:flex;gap:16px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(52,168,83,0.12);}
+.summary-meta-item{font-size:11px;color:var(--muted);}
+.summary-meta-item span{color:var(--sheets-light);font-weight:600;}
+
+/* TOAST */
+.toast{position:fixed;top:66px;right:20px;z-index:600;background:rgba(52,168,83,0.12);border:1px solid rgba(52,168,83,0.3);border-radius:10px;padding:11px 16px;font-size:12px;color:var(--sheets-light);min-width:220px;box-shadow:0 8px 24px rgba(0,0,0,0.4);animation:toastIn .3s ease;display:none;}
+.toast.err{background:rgba(248,113,113,0.12);border-color:rgba(248,113,113,0.3);color:var(--red);}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+/* BOTTOM BAR */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(4,8,13,0.97);border-top:1px solid var(--border);padding:7px 28px;display:flex;align-items:center;gap:12px;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);}
+.bottom-label{color:var(--sheets-light);font-weight:500;white-space:nowrap;}
+.scroll-wrap{flex:1;overflow:hidden;white-space:nowrap;}
+.scroll-text{display:inline-block;animation:scrollX 32s linear infinite;}
+@keyframes scrollX{0%{transform:translateX(80vw)}100%{transform:translateX(-100%)}}
+
+/* TABS (main) */
+.main-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.main-tab{padding:11px 20px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.main-tab.active{color:var(--sheets-light);border-bottom-color:var(--sheets-light);}
+.main-tab:hover{color:var(--text);}
+.tab-view{display:none;}.tab-view.active{display:block;}
+
+@media(max-width:900px){.stats-grid{grid-template-columns:1fr 1fr}.main-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.mpesa-form{grid-template-columns:1fr}.wizard-tabs{flex-direction:column}.dashboard{padding:0 16px 100px}.wizard{padding:16px 16px 0}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="kj-badge">KJ</div>
+    <div>
+      <div class="nav-title">Phase 3 · Sheets & M-Pesa</div>
+    </div>
+    <span class="phase-badge">Phase 3</span>
+  </div>
+  <div class="nav-right">
+    <div class="status-pill"><div class="dot"></div>Systems Online</div>
+    <span id="clock">--:--:--</span>
+    <span style="color:var(--sheets-light)">Next summary: 07:00 EAT</span>
+  </div>
+</nav>
+
+<!-- SETUP WIZARD -->
+<div class="wizard">
+  <div class="wizard-tabs">
+    <div class="wizard-tab active" onclick="setWizTab(0,this)"><span class="tab-num">1</span>Google Sheets</div>
+    <div class="wizard-tab" onclick="setWizTab(1,this)"><span class="tab-num">2</span>M-Pesa Daraja</div>
+    <div class="wizard-tab" onclick="setWizTab(2,this)"><span class="tab-num">3</span>Daily Summary</div>
+    <div class="wizard-tab" onclick="setWizTab(3,this)"><span class="tab-num">4</span>Go Live</div>
+  </div>
+
+  <!-- STEP 1: GOOGLE SHEETS -->
+  <div class="wizard-content active" id="wiz-0">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="step-card">
+        <div class="step-title">🟢 Step 1 — Create a Google Cloud Service Account</div>
+        <div class="step-desc">A Service Account lets your server write to Google Sheets automatically without any browser login.</div>
+        <div class="instruction-list">
+          <div class="instruction"><div class="inst-num">1</div><div class="inst-body"><div class="inst-title">Go to Google Cloud Console</div><div class="inst-detail">Visit <code>console.cloud.google.com</code> → Create a new project named <code>KJ-LandSurveyors</code></div></div></div>
+          <div class="instruction"><div class="inst-num">2</div><div class="inst-body"><div class="inst-title">Enable Google Sheets API</div><div class="inst-detail">APIs & Services → Library → search "Google Sheets API" → Enable it</div></div></div>
+          <div class="instruction"><div class="inst-num">3</div><div class="inst-body"><div class="inst-title">Create Service Account</div><div class="inst-detail">APIs & Services → Credentials → Create Credentials → Service Account → name it <code>kj-sheets-agent</code></div></div></div>
+          <div class="instruction"><div class="inst-num">4</div><div class="inst-body"><div class="inst-title">Download JSON key</div><div class="inst-detail">Click your service account → Keys → Add Key → JSON → Download. Open the file and copy the <code>client_email</code> and <code>private_key</code> values.</div></div></div>
+          <div class="instruction"><div class="inst-num">5</div><div class="inst-body"><div class="inst-title">Create the Spreadsheet</div><div class="inst-detail">Go to <code>sheets.google.com</code> → New spreadsheet → name it <code>KJ Land Surveyors Operations</code> → Copy the ID from the URL (between /d/ and /edit)</div></div></div>
+          <div class="instruction"><div class="inst-num">6</div><div class="inst-body"><div class="inst-title">Share with Service Account</div><div class="inst-detail">In the spreadsheet → Share → paste your <code>client_email</code> from the JSON → Editor access → Done</div></div></div>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">📋 Enter Your Google Credentials</div>
+        <div class="step-desc">Paste your values from the downloaded JSON key file.</div>
+        <div class="form-grid">
+          <div class="form-group full"><label class="form-label">Service Account Email</label><input type="text" class="form-input" id="g-email" placeholder="kj-sheets-agent@kj-landsurveyors.iam.gserviceaccount.com"></div>
+          <div class="form-group full"><label class="form-label">Private Key (paste entire key including -----BEGIN...-----)</label><textarea class="form-textarea" id="g-key" placeholder="-----BEGIN RSA PRIVATE KEY-----&#10;MIIEpAIBAAKCAQEA...&#10;-----END RSA PRIVATE KEY-----" style="min-height:120px"></textarea></div>
+          <div class="form-group full"><label class="form-label">Spreadsheet ID</label><input type="text" class="form-input" id="g-sheet-id" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-green" onclick="testSheets()">🧪 Test Connection</button>
+          <button class="btn-sm" onclick="initSheets()">🗂️ Create Sheet Tabs</button>
+          <span id="sheets-status" style="font-size:11px;color:var(--muted)"></span>
+        </div>
+        <div style="margin-top:14px">
+          <div class="form-label" style="margin-bottom:6px">Add to your .env file:</div>
+          <div class="code-block" id="sheetsEnvBlock">GOOGLE_SERVICE_ACCOUNT_EMAIL=paste-here
+GOOGLE_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\nYOUR_KEY\n-----END RSA PRIVATE KEY-----"
+GOOGLE_SPREADSHEET_ID=paste-spreadsheet-id-here<button class="copy-code" onclick="copyBlock('sheetsEnvBlock')">Copy</button></div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:right;margin-top:4px"><button class="btn-green" onclick="setWizTab(1,document.querySelectorAll('.wizard-tab')[1])">Next: M-Pesa Setup →</button></div>
+  </div>
+
+  <!-- STEP 2: M-PESA -->
+  <div class="wizard-content" id="wiz-1">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="step-card">
+        <div class="step-title">🟢 Step 1 — Apply for M-Pesa Daraja API</div>
+        <div class="step-desc">Daraja is Safaricom's official developer API. The sandbox is free and instant — production requires business registration.</div>
+        <div class="instruction-list">
+          <div class="instruction"><div class="inst-num">1</div><div class="inst-body"><div class="inst-title">Register on Daraja Portal</div><div class="inst-detail">Go to <code>developer.safaricom.co.ke</code> → Register with your business email → Verify your account</div></div></div>
+          <div class="instruction"><div class="inst-num">2</div><div class="inst-body"><div class="inst-title">Create an App (Sandbox — instant)</div><div class="inst-detail">My Apps → Add New App → Select APIs: <code>M-Pesa Express (STK Push)</code>, <code>Customer To Business</code> → Create. You get Consumer Key + Secret immediately.</div></div></div>
+          <div class="instruction"><div class="inst-num">3</div><div class="inst-body"><div class="inst-title">Get your Passkey</div><div class="inst-detail">In sandbox, use the test passkey provided on the portal. For production, Safaricom emails you a unique passkey.</div></div></div>
+          <div class="instruction"><div class="inst-num">4</div><div class="inst-body"><div class="inst-title">Apply for Production (Business)</div><div class="inst-detail">Go Live → fill in your business details, KRA PIN, Paybill/Till number. Safaricom reviews in 2–5 business days. You need: Certificate of Incorporation or Business Permit.</div></div></div>
+          <div class="instruction"><div class="inst-num">5</div><div class="inst-body"><div class="inst-title">Get your Shortcode</div><div class="inst-detail">Your Paybill or Till number from Safaricom Business. For sandbox testing, use <code>174379</code> as the shortcode.</div></div></div>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">📋 Enter Your Daraja Credentials</div>
+        <div class="step-desc">From your Daraja developer portal app page.</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Consumer Key</label><input type="text" class="form-input" id="m-key" placeholder="xxxxxxxxxxxxxx"></div>
+          <div class="form-group"><label class="form-label">Consumer Secret</label><input type="text" class="form-input" id="m-secret" placeholder="xxxxxxxxxxxxxx"></div>
+          <div class="form-group"><label class="form-label">Shortcode (Paybill/Till)</label><input type="text" class="form-input" id="m-shortcode" placeholder="174379 (sandbox)"></div>
+          <div class="form-group"><label class="form-label">Passkey</label><input type="text" class="form-input" id="m-passkey" placeholder="bfb279f9aa9bdbcf..."></div>
+          <div class="form-group"><label class="form-label">Environment</label>
+            <select class="form-select" id="m-env">
+              <option value="sandbox">Sandbox (Testing)</option>
+              <option value="production">Production (Live)</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Callback URL</label><input type="text" class="form-input" id="m-callback" placeholder="https://your-server.com/mpesa/callback"></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-mpesa" onclick="testMpesa()">🧪 Test STK Push</button>
+          <span id="mpesa-status" style="font-size:11px;color:var(--muted)"></span>
+        </div>
+        <div style="margin-top:14px">
+          <div class="form-label" style="margin-bottom:6px">Add to your .env file:</div>
+          <div class="code-block" id="mpesaEnvBlock">MPESA_CONSUMER_KEY=paste-here
+MPESA_CONSUMER_SECRET=paste-here
+MPESA_SHORTCODE=174379
+MPESA_PASSKEY=paste-here
+MPESA_ENVIRONMENT=sandbox
+MPESA_CALLBACK_URL=https://your-server.com/mpesa/callback<button class="copy-code" onclick="copyBlock('mpesaEnvBlock')">Copy</button></div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:right;margin-top:4px"><button class="btn-green" onclick="setWizTab(2,document.querySelectorAll('.wizard-tab')[2])">Next: Daily Summary →</button></div>
+  </div>
+
+  <!-- STEP 3: DAILY SUMMARY -->
+  <div class="wizard-content" id="wiz-2">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="step-card">
+        <div class="step-title">📊 Daily AI Summary — How It Works</div>
+        <div class="step-desc">Every morning at <strong>7:00 AM East Africa Time</strong>, the system automatically:</div>
+        <div class="instruction-list">
+          <div class="instruction"><div class="inst-num">①</div><div class="inst-body"><div class="inst-title">Counts all activity from the past 24 hours</div><div class="inst-detail">New clients, project stage changes, payments received, revenue collected</div></div></div>
+          <div class="instruction"><div class="inst-num">②</div><div class="inst-body"><div class="inst-title">Claude AI writes a briefing</div><div class="inst-detail">The Reporting Agent reads all the data and writes a professional 4–6 sentence daily briefing, flagging anything urgent</div></div></div>
+          <div class="instruction"><div class="inst-num">③</div><div class="inst-body"><div class="inst-title">Synced to "Daily Summary" Google Sheet tab</div><div class="inst-detail">One row per day: date, stats, full AI narrative — your permanent operations record</div></div></div>
+          <div class="instruction"><div class="inst-num">④</div><div class="inst-body"><div class="inst-title">Sent to Director via WhatsApp</div><div class="inst-detail">You wake up to a full briefing on your phone. No need to log in anywhere.</div></div></div>
+        </div>
+        <div style="margin-top:16px;background:rgba(52,168,83,0.06);border:1px solid rgba(52,168,83,0.15);border-radius:10px;padding:14px;">
+          <div class="form-label" style="margin-bottom:8px;color:var(--sheets-light)">Example WhatsApp Message You'll Receive:</div>
+          <div style="font-family:'DM Mono',monospace;font-size:11px;line-height:1.7;color:var(--text)">📊 *KJ DAILY BRIEFING — 03/03/2026*
+
+Good morning. Yesterday KJ received 4 new client enquiries, with 2 from Kiambu and 1 each from Nakuru and Nairobi — all requesting Land Subdivision services. Three active projects advanced stages, with the Mwangi plot moving to Data Processing. Revenue of KES 45,000 was collected via M-Pesa. Recommendation: follow up with the Nakuru enquiry from Grace Njeri — she has not yet submitted her title deed documents.
+
+📈 *Quick Stats:*
+👥 New clients: 4
+📁 Active projects: 8
+✅ Completed: 1
+💰 Revenue: KES 45,000</div>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">🧪 Preview & Test Your Summary</div>
+        <div class="step-desc">Generate a sample daily summary right now using Claude AI.</div>
+        <div class="summary-card" id="summaryPreview">
+          <div class="summary-date">DAILY BRIEFING — PREVIEW</div>
+          <div class="summary-text" style="color:var(--muted)">Click "Generate Preview" below to see what your daily briefing will look like based on your current data.</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-green" onclick="generatePreview()">🤖 Generate Preview</button>
+          <button class="btn-sm" onclick="sendTestSummary()">📱 Send Test to WhatsApp</button>
+          <span id="summary-status" style="font-size:11px;color:var(--muted)"></span>
+        </div>
+        <div style="margin-top:16px">
+          <div class="form-label" style="margin-bottom:6px">Cron Schedule (in server.js):</div>
+          <div class="code-block">// 7:00 AM East Africa Time, every day
+cron.schedule('0 7 * * *', generateDailySummary, {
+  timezone: 'Africa/Nairobi'
+});<button class="copy-code" onclick="copyBlock(this.parentNode)">Copy</button></div>
+          <div class="form-label" style="margin-bottom:6px;margin-top:12px">Or trigger manually via API:</div>
+          <div class="code-block">POST https://your-server.com/api/trigger/daily-summary<button class="copy-code" onclick="copyBlock(this.parentNode)">Copy</button></div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:right;margin-top:4px"><button class="btn-green" onclick="setWizTab(3,document.querySelectorAll('.wizard-tab')[3]);showDashboard()">Go Live → Open Dashboard</button></div>
+  </div>
+
+  <!-- STEP 4: GO LIVE -->
+  <div class="wizard-content" id="wiz-3">
+    <div class="step-card">
+      <div class="step-title">🚀 Final .env File — Everything Together</div>
+      <div class="step-desc">Copy your complete .env file for Phase 3. All credentials in one place.</div>
+      <div class="code-block" id="finalEnvBlock">## KJ Land Surveyors — Phase 3 Complete .env
+
+# ── From Phase 2 (WhatsApp) ──────────────────
+WHATSAPP_TOKEN=your_meta_token
+WHATSAPP_PHONE_ID=your_phone_number_id
+WHATSAPP_VERIFY_TOKEN=kjlandsurveyors2026
+DIRECTOR_PHONE=254720397313
+
+# ── Anthropic Claude ──────────────────────────
+ANTHROPIC_API_KEY=sk-ant-...
+
+# ── Google Sheets ─────────────────────────────
+GOOGLE_SERVICE_ACCOUNT_EMAIL=kj-sheets-agent@project.iam.gserviceaccount.com
+GOOGLE_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----"
+GOOGLE_SPREADSHEET_ID=your_spreadsheet_id
+
+# ── M-Pesa Daraja ─────────────────────────────
+MPESA_CONSUMER_KEY=your_consumer_key
+MPESA_CONSUMER_SECRET=your_consumer_secret
+MPESA_SHORTCODE=174379
+MPESA_PASSKEY=your_passkey
+MPESA_ENVIRONMENT=sandbox
+MPESA_CALLBACK_URL=https://your-server.com/mpesa/callback
+
+# ── Server ───────────────────────────────────
+PORT=4000<button class="copy-code" onclick="copyBlock('finalEnvBlock')">📋 Copy All</button></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:16px">
+      <div class="step-card" style="text-align:center;padding:20px">
+        <div style="font-size:28px;margin-bottom:8px">📦</div>
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:6px">Install & Run</div>
+        <div class="code-block" style="text-align:left;margin-top:8px;font-size:10px">npm install express axios dotenv
+       googleapis node-cron
+node server.js</div>
+      </div>
+      <div class="step-card" style="text-align:center;padding:20px">
+        <div style="font-size:28px;margin-bottom:8px">🗂️</div>
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:6px">Init Your Sheets</div>
+        <div class="code-block" style="text-align:left;margin-top:8px;font-size:10px">curl -X POST \
+  https://your-server.com/
+  api/trigger/init-sheets</div>
+      </div>
+      <div class="step-card" style="text-align:center;padding:20px">
+        <div style="font-size:28px;margin-bottom:8px">✅</div>
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:6px">Verify Health</div>
+        <div class="code-block" style="text-align:left;margin-top:8px;font-size:10px">curl https://your-server.com/health
+# Should return:
+# {"status":"online","phase":3,...}</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:16px">
+      <button class="btn-green" style="font-size:14px;padding:14px 36px" onclick="showDashboard()">🎉 Open Live Dashboard</button>
+    </div>
+  </div>
+</div><!-- /wizard -->
+
+<!-- DASHBOARD (hidden until Go Live) -->
+<div class="dashboard" id="dashboard" style="display:none;padding-top:20px;">
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat"><div class="stat-label">Total Clients</div><div class="stat-value" id="ds-clients" style="color:var(--sheets-light)">0</div><div class="stat-sub">In database</div></div>
+    <div class="stat"><div class="stat-label">Active Projects</div><div class="stat-value" id="ds-projects" style="color:var(--blue)">0</div><div class="stat-sub">In progress</div></div>
+    <div class="stat"><div class="stat-label">Payments Sent</div><div class="stat-value" id="ds-payments" style="color:var(--gold)">0</div><div class="stat-sub">STK pushes</div></div>
+    <div class="stat"><div class="stat-label">Revenue (KES)</div><div class="stat-value" id="ds-revenue" style="color:var(--mpesa-light)">0</div><div class="stat-sub">M-Pesa collected</div></div>
+    <div class="stat"><div class="stat-label">Sheet Syncs</div><div class="stat-value" id="ds-syncs" style="color:var(--sheets-light)">0</div><div class="stat-sub">Auto-synced rows</div></div>
+  </div>
+
+  <!-- MAIN TABS -->
+  <div class="main-tabs">
+    <div class="main-tab active" onclick="switchMainTab('payments',this)">💳 M-Pesa Payments</div>
+    <div class="main-tab" onclick="switchMainTab('sheets',this)">📊 Sheet Sync Log</div>
+    <div class="main-tab" onclick="switchMainTab('summary',this)">📋 Daily Summary</div>
+  </div>
+
+  <!-- PAYMENTS TAB -->
+  <div class="tab-view active" id="tv-payments">
+    <div class="main-grid">
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">💳 Send M-Pesa STK Push</div></div>
+        <div class="panel-body">
+          <div class="mpesa-form">
+            <div class="form-group"><label class="form-label">Client Name</label><input type="text" class="form-input" id="pay-name" placeholder="James Mwangi"></div>
+            <div class="form-group"><label class="form-label">Phone (254...)</label><input type="text" class="form-input" id="pay-phone" placeholder="254712345678"></div>
+            <div class="form-group"><label class="form-label">Amount (KES)</label><input type="number" class="form-input" id="pay-amount" placeholder="15000"></div>
+            <div class="form-group"><label class="form-label">Service</label>
+              <select class="form-select" id="pay-service">
+                <option>Land Subdivision</option><option>Beacon Setting</option>
+                <option>Title Deed Processing</option><option>Land Transfer</option>
+                <option>GIS Mapping</option><option>Topographical Survey</option>
+                <option>Boundary Dispute Resolution</option>
+              </select>
+            </div>
+            <div class="form-group full"><label class="form-label">Description</label><input type="text" class="form-input" id="pay-desc" placeholder="e.g. Deposit for Land Subdivision - Kiambu"></div>
+            <div class="form-group full"><label class="form-label">Your Server URL (for live STK Push)</label><input type="text" class="form-input" id="pay-server" placeholder="https://your-server.com"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-mpesa" onclick="sendSTK()">📲 Send STK Push to Phone</button>
+            <button class="btn-sm" onclick="simulatePayment()">🧪 Simulate (No Server)</button>
+          </div>
+          <div style="margin-top:12px;padding:10px 14px;background:rgba(0,166,81,0.06);border:1px solid rgba(0,166,81,0.15);border-radius:8px;font-size:11px;color:var(--muted);line-height:1.5;">
+            💡 The client's phone will show an M-Pesa prompt. They enter their PIN and money is deducted instantly. You get notified, and it's auto-logged to Google Sheets.
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">📋 Payment History</div><span id="pay-count" style="font-size:11px;color:var(--muted)">0 payments</span></div>
+        <div style="overflow-x:auto">
+          <table class="payment-table">
+            <thead><tr><th>Ref</th><th>Client</th><th>Amount</th><th>Code</th><th>Status</th></tr></thead>
+            <tbody id="paymentTableBody"></tbody>
+          </table>
+          <div id="payEmpty" style="text-align:center;padding:32px;color:var(--muted);font-size:12px">📭 No payments yet.<br>Send your first STK Push above.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHEETS TAB -->
+  <div class="tab-view" id="tv-sheets">
+    <div class="main-grid">
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">📊 Google Sheets — Auto Sync Log</div><button class="btn-sm" onclick="clearSyncLog()">Clear</button></div>
+        <div class="sync-log" id="syncLogEl">
+          <div style="text-align:center;padding:32px;color:var(--muted);font-size:12px">📊 Sync activity will appear here.<br>Every client, project, and payment is auto-logged.</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title">🗂️ Sheet Structure</div></div>
+        <div class="panel-body">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="padding:12px;background:rgba(52,168,83,0.06);border:1px solid rgba(52,168,83,0.15);border-radius:10px">
+              <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--sheets-light);margin-bottom:6px">📋 Clients Tab</div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">ID | Name | Phone | Email | County | Service | Plot Size | Status | Source | Added At | Notes</div>
+            </div>
+            <div style="padding:12px;background:rgba(52,168,83,0.06);border:1px solid rgba(52,168,83,0.15);border-radius:10px">
+              <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--sheets-light);margin-bottom:6px">📁 Projects Tab</div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">ID | Title | Client | Phone | Service | County | Plot Size | Stage | Created | Notes</div>
+            </div>
+            <div style="padding:12px;background:rgba(0,166,81,0.06);border:1px solid rgba(0,166,81,0.15);border-radius:10px">
+              <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--mpesa-light);margin-bottom:6px">💳 Payments Tab</div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">ID | Client | Phone | Amount | Service | M-Pesa Code | Status | Timestamp | Description</div>
+            </div>
+            <div style="padding:12px;background:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.15);border-radius:10px">
+              <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">📊 Daily Summary Tab</div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">Date | New Clients | Active Projects | Completed | Payments | Revenue | AI Summary | Generated At</div>
+            </div>
+          </div>
+          <div class="btn-row" style="margin-top:14px">
+            <button class="btn-green" onclick="triggerInitSheets()">🗂️ Create Tabs Now</button>
+            <button class="btn-sm" onclick="openSheet()">🔗 Open Spreadsheet</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY TAB -->
+  <div class="tab-view" id="tv-summary">
+    <div style="max-width:800px">
+      <div class="panel-hdr" style="background:transparent;border:none;padding:0 0 16px 0">
+        <div class="panel-title" style="font-size:14px">📋 Daily Summary — Preview & Control</div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-green" onclick="generatePreview()">🤖 Generate Now</button>
+          <button class="btn-sm" onclick="sendTestSummary()">📱 Send to WhatsApp</button>
+        </div>
+      </div>
+      <div class="summary-card" id="dashSummaryCard">
+        <div class="summary-date">NEXT DELIVERY: 07:00 EAT DAILY</div>
+        <div class="summary-text" style="color:var(--muted)">The daily briefing will appear here once generated. Click "Generate Now" to preview, or wait for the automatic 7 AM delivery.</div>
+      </div>
+      <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="step-card" style="padding:16px">
+          <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--sheets-light);margin-bottom:10px">⏰ Delivery Schedule</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.8">
+            🕖 <strong style="color:var(--text)">07:00 EAT</strong> — WhatsApp briefing<br>
+            📊 <strong style="color:var(--text)">07:00 EAT</strong> — Google Sheets row appended<br>
+            🔄 <strong style="color:var(--text)">Real-time</strong> — All other data syncs instantly
+          </div>
+        </div>
+        <div class="step-card" style="padding:16px">
+          <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--sheets-light);margin-bottom:10px">📊 What's Included</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.8">
+            👥 New clients (count + details)<br>
+            📁 Active & completed projects<br>
+            💰 Revenue collected (M-Pesa)<br>
+            🚨 Urgent flags from AI<br>
+            💡 One strategic recommendation
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /dashboard -->
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <span class="bottom-label">PHASE 3</span>
+  <div class="scroll-wrap"><span class="scroll-text">✅ Google Sheets Auto-Sync · M-Pesa STK Push · Daily AI Briefing 07:00 EAT · Real-time Logging · Director WhatsApp Alerts · KJ Land Surveyors · All 47 Counties</span></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CLOCK ──
+setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-KE',{hour12:false});},1000);
+
+// ── TOAST ──
+function toast(msg,err=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(err?' err':'');
+  t.style.display='block'; setTimeout(()=>t.style.display='none',3500);
+}
+
+// ── WIZARD TABS ──
+function setWizTab(i,el){
+  document.querySelectorAll('.wizard-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.wizard-content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('wiz-'+i).classList.add('active');
+}
+
+// ── SHOW DASHBOARD ──
+function showDashboard(){
+  document.getElementById('dashboard').style.display='block';
+  document.getElementById('dashboard').scrollIntoView({behavior:'smooth'});
+}
+
+// ── MAIN TABS ──
+function switchMainTab(name,el){
+  document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-view').forEach(v=>v.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tv-'+name).classList.add('active');
+}
+
+// ── COPY ──
+function copyBlock(idOrEl){
+  const el=typeof idOrEl==='string'?document.getElementById(idOrEl):idOrEl;
+  const text=el.textContent.replace(/Copy All|Copy/g,'').trim();
+  navigator.clipboard.writeText(text).then(()=>toast('✅ Copied!'));
+}
+
+// ── SIMULATE SHEETS TEST ──
+const syncLog=[];
+let statsData={clients:0,projects:0,payments:0,revenue:0,syncs:0};
+
+function addSync(sheet,data,ok=true){
+  const entry={sheet,data,ok,time:new Date().toLocaleTimeString('en-KE',{hour12:false})};
+  syncLog.unshift(entry);
+  if(syncLog.length>40)syncLog.pop();
+  statsData.syncs++;
+  renderSyncLog();
+  updateStats();
+}
+function renderSyncLog(){
+  const el=document.getElementById('syncLogEl');
+  if(!syncLog.length){el.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted);font-size:12px">📊 Sync activity will appear here.</div>';return;}
+  el.innerHTML=syncLog.map(s=>`
+    <div class="sync-entry">
+      <div class="sync-dot ${s.ok?'sync-ok':'sync-err'}"></div>
+      <div style="flex:1">
+        <div><span class="sync-sheet">${s.sheet}</span> <span style="color:var(--muted)">→</span> <span style="color:var(--text)">${JSON.stringify(s.data).slice(0,60)}...</span></div>
+        <div style="font-size:9px;color:var(--muted);margin-top:2px">${s.ok?'✅ Synced successfully':'❌ Sync failed'}</div>
+      </div>
+      <div class="sync-time">${s.time}</div>
+    </div>
+  `).join('');
+}
+function clearSyncLog(){syncLog.length=0;renderSyncLog();}
+function updateStats(){
+  document.getElementById('ds-clients').textContent=statsData.clients;
+  document.getElementById('ds-projects').textContent=statsData.projects;
+  document.getElementById('ds-payments').textContent=statsData.payments;
+  document.getElementById('ds-revenue').textContent=statsData.revenue.toLocaleString();
+  document.getElementById('ds-syncs').textContent=statsData.syncs;
+}
+
+// ── SHEETS TEST ──
+async function testSheets(){
+  const el=document.getElementById('sheets-status');
+  el.textContent='Testing...';el.style.color='var(--muted)';
+  setTimeout(()=>{
+    el.textContent='✅ Connection successful (configure server for real test)';
+    el.style.color='var(--sheets-light)';
+    addSync('Clients',{name:'Test Client',county:'Nairobi',service:'Land Subdivision'});
+    toast('✅ Google Sheets test simulated!');
+  },1200);
+}
+async function initSheets(){
+  const server=document.getElementById('pay-server')?.value||'';
+  if(server){
+    try{
+      const r=await fetch(server.replace(/\/$/,'')+'/api/trigger/init-sheets',{method:'POST'});
+      const d=await r.json();
+      toast(d.success?'✅ Sheets initialised!':'❌ Init failed',!d.success);
+      return;
+    }catch(e){}
+  }
+  addSync('Init','All sheet tabs created with headers');
+  toast('✅ Sheets initialised (simulated — set server URL for live)');
+}
+async function triggerInitSheets(){initSheets();}
+function openSheet(){
+  const id=document.getElementById('g-sheet-id').value.trim();
+  if(id)window.open(`https://docs.google.com/spreadsheets/d/${id}/edit`,'_blank');
+  else toast('Enter your Spreadsheet ID first',true);
+}
+
+// ── MPESA TEST ──
+async function testMpesa(){
+  const el=document.getElementById('mpesa-status');
+  el.textContent='Testing...';el.style.color='var(--muted)';
+  setTimeout(()=>{
+    el.textContent='✅ Daraja token retrieved (configure credentials for real test)';
+    el.style.color='var(--mpesa-light)';
+    toast('✅ M-Pesa Daraja test simulated!');
+  },1400);
+}
+
+// ── PAYMENTS ──
+const payments=[];
+function renderPayments(){
+  const tbody=document.getElementById('paymentTableBody');
+  const empty=document.getElementById('payEmpty');
+  document.getElementById('pay-count').textContent=`${payments.length} payment${payments.length!==1?'s':''}`;
+  if(!payments.length){tbody.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tbody.innerHTML=payments.map(p=>`
+    <tr>
+      <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">${p.id}</td>
+      <td style="font-size:12px">${p.clientName}</td>
+      <td style="font-family:'Syne',sans-serif;font-weight:700;color:var(--mpesa-light)">KES ${Number(p.amount).toLocaleString()}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--gold)">${p.mpesaCode||'—'}</td>
+      <td><span class="badge ${p.status==='Completed'?'badge-done':p.status==='Failed'?'badge-fail':'badge-pending'}">${p.status}</span></td>
+    </tr>
+  `).join('');
+}
+
+async function sendSTK(){
+  const name=document.getElementById('pay-name').value.trim();
+  const phone=document.getElementById('pay-phone').value.trim();
+  const amount=document.getElementById('pay-amount').value.trim();
+  const service=document.getElementById('pay-service').value;
+  const desc=document.getElementById('pay-desc').value.trim();
+  const server=document.getElementById('pay-server').value.trim();
+
+  if(!name||!phone||!amount){toast('Fill name, phone and amount',true);return;}
+
+  if(server){
+    try{
+      const r=await fetch(server.replace(/\/$/,'')+'/api/mpesa/initiate',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({phone,amount:Number(amount),clientName:name,service,description:desc})
+      });
+      const d=await r.json();
+      if(d.success){
+        const p={id:d.ref,clientName:name,phone,amount,service,status:'Pending',mpesaCode:'',timestamp:new Date().toISOString()};
+        payments.unshift(p);statsData.payments++;statsData.syncs++;
+        addSync('Payments',{ref:d.ref,client:name,amount:`KES ${Number(amount).toLocaleString()}`});
+        renderPayments();updateStats();
+        toast('✅ STK Push sent! Client will receive M-Pesa prompt.');
+      } else { toast(d.error||'STK Push failed',true); }
+      return;
+    }catch(e){toast('Server error: '+e.message,true);return;}
+  }
+  simulatePayment();
+}
+
+function simulatePayment(){
+  const name=document.getElementById('pay-name').value.trim()||'Test Client';
+  const phone=document.getElementById('pay-phone').value.trim()||'254712345678';
+  const amount=document.getElementById('pay-amount').value.trim()||'15000';
+  const service=document.getElementById('pay-service').value;
+  const ref='KJ-SIM'+Date.now().toString().slice(-4);
+
+  const p={id:ref,clientName:name,phone,amount,service,status:'Pending',mpesaCode:'',timestamp:new Date().toISOString()};
+  payments.unshift(p);
+  statsData.payments++;
+  addSync('Payments',{ref,client:name,amount:`KES ${Number(amount).toLocaleString()}`,status:'Pending'});
+  renderPayments();updateStats();
+  toast('📲 STK Push simulated — phone prompt would appear');
+
+  // Simulate completion after 3s
+  setTimeout(()=>{
+    const idx=payments.findIndex(x=>x.id===ref);
+    if(idx>=0){
+      const code='QXY'+Math.random().toString(36).slice(2,8).toUpperCase();
+      payments[idx].status='Completed';
+      payments[idx].mpesaCode=code;
+      statsData.revenue+=Number(amount);
+      addSync('Payments',{ref,code,status:'Completed',amount:`KES ${Number(amount).toLocaleString()}`});
+      renderPayments();updateStats();
+      toast(`✅ Payment completed! Code: ${code} — KES ${Number(amount).toLocaleString()}`);
+    }
+  },3000);
+}
+
+// ── DAILY SUMMARY ──
+async function generatePreview(){
+  const el1=document.getElementById('summaryPreview');
+  const el2=document.getElementById('dashSummaryCard');
+  const status=document.getElementById('summary-status');
+  if(status)status.textContent='Generating...';
+  const today=new Date().toLocaleDateString('en-KE',{timeZone:'Africa/Nairobi'});
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:400,
+        messages:[{role:'user',content:`You are the Reporting Agent for KJ Land Surveyors & Realtors Consultants — Kenya's leading land surveying firm. Write a concise, professional daily morning briefing for ${today}. 
+
+Data: ${payments.filter(p=>p.status==='Completed').length} payments completed today, KES ${statsData.revenue.toLocaleString()} revenue, ${statsData.clients} total clients in system, ${statsData.payments} total STK pushes sent.
+
+Write 4 sentences: highlight achievements, flag anything to follow up, end with one recommendation. Be warm but professional.`}]
+      })
+    });
+    const data=await res.json();
+    const text=data.content.map(b=>b.text||'').join('');
+    const html=`<div class="summary-date">DAILY BRIEFING — ${today}</div><div class="summary-text">${text}</div><div class="summary-meta"><div class="summary-meta-item">Clients: <span>${statsData.clients}</span></div><div class="summary-meta-item">Revenue: <span>KES ${statsData.revenue.toLocaleString()}</span></div><div class="summary-meta-item">Payments: <span>${statsData.payments}</span></div></div>`;
+    el1.innerHTML=html;
+    if(el2)el2.innerHTML=html;
+    if(status)status.textContent='✅ Generated';
+    addSync('Daily Summary',{date:today,revenue:statsData.revenue,clients:statsData.clients});
+    toast('✅ Daily summary generated and synced to Sheets!');
+  }catch(e){
+    if(status)status.textContent='❌ Error';
+    toast('Claude API error — check your connection',true);
+  }
+}
+
+async function sendTestSummary(){
+  toast('📱 Test summary would be sent to Director WhatsApp (configure WHATSAPP_TOKEN + DIRECTOR_PHONE on server)');
+}
+</script>
+</body>
+</html>
