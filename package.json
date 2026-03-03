@@ -1,20 +1,17 @@
 {
-  "name": "kj-phase3-sheets-mpesa",
+  "name": "kj-ai-server",
   "version": "1.0.0",
-  "description": "KJ Land Surveyors — Phase 3: Google Sheets + M-Pesa + Daily AI Summary",
+  "description": "KJ Land Surveyors AI Server",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node server.js"
   },
   "dependencies": {
-    "axios": "^1.6.0",
-    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "googleapis": "^140.0.0",
-    "node-cron": "^3.0.3"
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1"
   },
-  "devDependencies": {
-    "nodemon": "^3.0.2"
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
