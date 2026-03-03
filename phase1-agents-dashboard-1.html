@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KJ Land Surveyors — AI Company Phase 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #060810;
+  --panel: #0d1117;
+  --panel2: #111827;
+  --border: rgba(99,102,241,0.15);
+  --border2: rgba(255,255,255,0.07);
+  --blue: #4f46e5;
+  --blue-light: #818cf8;
+  --green: #059669;
+  --green-light: #34d399;
+  --orange: #d97706;
+  --orange-light: #fbbf24;
+  --cyan: #0891b2;
+  --cyan-light: #67e8f9;
+  --purple: #7c3aed;
+  --purple-light: #c4b5fd;
+  --red: #dc2626;
+  --text: #f1f5f9;
+  --muted: #64748b;
+  --dim: #1e293b;
+  --gold: #d97706;
+  --gold-light: #fbbf24;
+}
+
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: linear-gradient(rgba(79,70,229,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(79,70,229,0.03) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none; z-index: 0;
+}
+
+/* ════════════════════════════════
+   LOGIN SCREEN
+════════════════════════════════ */
+#loginScreen {
+  position: fixed; inset: 0; z-index: 1000;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+}
+
+.login-glow {
+  position: absolute;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(79,70,229,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: glowPulse 4s ease-in-out infinite;
+}
+@keyframes glowPulse { 0%,100%{opacity:0.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.15)} }
+
+.login-box {
+  position: relative; z-index: 1;
+  background: rgba(13,17,23,0.9);
+  border: 1px solid rgba(99,102,241,0.25);
+  border-radius: 24px;
+  padding: 48px 40px;
+  width: 100%; max-width: 420px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 80px rgba(79,70,229,0.12), 0 32px 64px rgba(0,0,0,0.5);
+  animation: loginIn 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+@keyframes loginIn { from{opacity:0;transform:scale(0.92) translateY(24px)} to{opacity:1;transform:scale(1) translateY(0)} }
+
+.login-logo {
+  text-align: center; margin-bottom: 32px;
+}
+.login-logo .kj {
+  width: 64px; height: 64px;
+  background: linear-gradient(135deg, var(--blue), var(--blue-light));
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 26px; font-weight: 800;
+  color: #fff;
+  margin: 0 auto 14px;
+  box-shadow: 0 8px 32px rgba(79,70,229,0.4);
+}
+.login-logo h1 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
+.login-logo p { font-size: 12px; color: var(--muted); margin-top: 4px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+.login-label { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; display: block; }
+
+.login-input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  margin-bottom: 16px;
+}
+.login-input:focus { border-color: rgba(99,102,241,0.5); }
+.login-input::placeholder { color: var(--muted); }
+
+.login-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--blue), #6366f1);
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  color: #fff;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(79,70,229,0.35);
+  margin-top: 4px;
+}
+.login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(79,70,229,0.5); }
+.login-btn:active { transform: translateY(0); }
+
+.login-error {
+  background: rgba(220,38,38,0.1);
+  border: 1px solid rgba(220,38,38,0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #f87171;
+  margin-top: 12px;
+  display: none;
+}
+
+.login-hint { text-align: center; margin-top: 20px; font-size: 11px; color: var(--muted); }
+
+/* ════════════════════════════════
+   MAIN APP
+════════════════════════════════ */
+#appScreen { display: none; min-height: 100vh; }
+
+/* NAV */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(6,8,16,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 28px;
+  display: flex; align-items: center; gap: 14px;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 16px; color: var(--gold-light);
+}
+.nav-badge {
+  background: linear-gradient(135deg, #d97706, #fbbf24);
+  color: #000; font-size: 9px; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px;
+  letter-spacing: 0.07em; text-transform: uppercase;
+}
+.nav-phase {
+  background: rgba(79,70,229,0.15);
+  border: 1px solid rgba(99,102,241,0.3);
+  color: var(--blue-light);
+  font-size: 10px; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.nav-right {
+  margin-left: auto; display: flex; align-items: center; gap: 16px;
+  font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace;
+}
+.live-dot {
+  width: 6px; height: 6px; background: #22c55e; border-radius: 50%;
+  display: inline-block; margin-right: 5px;
+  animation: blink 1.5s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.logout-btn {
+  background: rgba(220,38,38,0.1);
+  border: 1px solid rgba(220,38,38,0.25);
+  color: #f87171; font-size: 11px;
+  padding: 5px 12px; border-radius: 8px;
+  cursor: pointer; transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.logout-btn:hover { background: rgba(220,38,38,0.2); }
+
+/* TABS */
+.tabs {
+  display: flex; gap: 0;
+  background: rgba(13,17,23,0.8);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  overflow-x: auto;
+}
+.tab {
+  padding: 12px 20px;
+  font-size: 12px; font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.02em;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--blue-light); border-bottom-color: var(--blue-light); }
+
+/* MAIN CONTENT */
+.main { position: relative; z-index: 1; padding: 24px 28px 100px; max-width: 1600px; margin: 0 auto; }
+
+/* SECTION VIEWS */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── ORG CHART (from previous) with compact styling ── */
+.founder-box {
+  background: linear-gradient(135deg, rgba(79,70,229,0.12), rgba(13,17,23,0.9));
+  border: 1px solid rgba(99,102,241,0.35);
+  border-radius: 14px; padding: 16px 28px;
+  text-align: center; margin-bottom: 10px;
+}
+.founder-box h2 { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; color: #a5b4fc; }
+.founder-box p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.arrow-down { display: flex; justify-content: center; margin: 4px 0; color: var(--muted); font-size: 18px; }
+
+.tier-row { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 14px; margin-bottom: 10px; align-items: start; }
+.bottom-tier { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 10px; }
+.right-stack { display: flex; flex-direction: column; gap: 12px; }
+
+.dept { border-radius: 12px; border: 1px solid; overflow: hidden; }
+.dept-header {
+  padding: 10px 14px;
+  font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.dept-body { padding: 10px; }
+.agents-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.agents-grid.single { grid-template-columns: 1fr; }
+.agents-grid.triple { grid-template-columns: 1fr 1fr 1fr; }
+
+.agent-btn {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 9px; padding: 9px 11px;
+  cursor: pointer; transition: all 0.2s; text-align: left; position: relative; overflow: hidden;
+}
+.agent-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.agent-btn .agent-name { font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; display: block; margin-bottom: 2px; }
+.agent-btn .agent-role { font-size: 9px; color: var(--muted); display: block; }
+.agent-pulse { position: absolute; top: 8px; right: 8px; width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0.5; animation: blink 1.5s infinite; }
+
+.master-dept { background: linear-gradient(160deg, rgba(79,70,229,0.1), rgba(13,17,23,0.9)); border-color: rgba(99,102,241,0.35); }
+.master-dept .dept-header { background: rgba(79,70,229,0.2); color: #a5b4fc; }
+.master-dept .agent-btn { color: #a5b4fc; }
+
+.sales-dept { background: linear-gradient(160deg, rgba(5,150,105,0.09), rgba(13,17,23,0.9)); border-color: rgba(52,211,153,0.25); }
+.sales-dept .dept-header { background: rgba(5,150,105,0.18); color: #6ee7b7; }
+.sales-dept .agent-btn { color: #6ee7b7; }
+
+.marketing-dept { background: linear-gradient(160deg, rgba(217,119,6,0.09), rgba(13,17,23,0.9)); border-color: rgba(251,191,36,0.25); }
+.marketing-dept .dept-header { background: rgba(217,119,6,0.18); color: #fde68a; }
+.marketing-dept .agent-btn { color: #fde68a; }
+
+.ops-dept { background: linear-gradient(160deg, rgba(8,145,178,0.09), rgba(13,17,23,0.9)); border-color: rgba(103,232,249,0.25); }
+.ops-dept .dept-header { background: rgba(8,145,178,0.18); color: #67e8f9; }
+.ops-dept .agent-btn { color: #67e8f9; }
+
+.finance-dept { background: linear-gradient(160deg, rgba(124,58,237,0.09), rgba(13,17,23,0.9)); border-color: rgba(196,181,253,0.25); }
+.finance-dept .dept-header { background: rgba(124,58,237,0.18); color: #c4b5fd; }
+.finance-dept .agent-btn { color: #c4b5fd; }
+
+.learning-dept { background: linear-gradient(160deg, rgba(217,119,6,0.09), rgba(13,17,23,0.9)); border-color: rgba(251,191,36,0.25); }
+.learning-dept .dept-header { background: rgba(217,119,6,0.18); color: #fde68a; }
+.learning-dept .agent-btn { color: #fde68a; }
+
+.cloud-bar {
+  background: rgba(17,24,39,0.8); border: 1px solid rgba(100,116,139,0.25);
+  border-radius: 12px; padding: 14px 18px; margin-bottom: 10px;
+}
+.cloud-bar h3 { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; text-align: center; }
+.cloud-items { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+.cloud-item { background: rgba(255,255,255,0.03); border: 1px solid var(--border2); border-radius: 8px; padding: 8px; text-align: center; font-size: 10px; color: var(--muted); }
+.cloud-icon { font-size: 18px; display: block; margin-bottom: 3px; }
+.output-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.output-box { background: rgba(30,41,59,0.4); border: 1px solid rgba(100,116,139,0.2); border-radius: 10px; padding: 12px; text-align: center; font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+/* ════════════════════════════════
+   CLIENTS VIEW
+════════════════════════════════ */
+.view-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.view-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; }
+.view-subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--blue), #6366f1);
+  border: none; border-radius: 10px; padding: 10px 18px;
+  color: #fff; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+  cursor: pointer; letter-spacing: 0.04em; transition: all 0.2s;
+  box-shadow: 0 4px 15px rgba(79,70,229,0.3);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(79,70,229,0.4); }
+
+.btn-sm {
+  background: rgba(255,255,255,0.05); border: 1px solid var(--border2);
+  border-radius: 7px; padding: 5px 11px;
+  color: var(--muted); font-size: 11px; cursor: pointer; transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-sm:hover { background: rgba(255,255,255,0.09); color: var(--text); }
+.btn-danger { background: rgba(220,38,38,0.1); border-color: rgba(220,38,38,0.2); color: #f87171; }
+.btn-danger:hover { background: rgba(220,38,38,0.2); }
+
+.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px;
+}
+.stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.stat-value { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; }
+.stat-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+.table-wrap {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+}
+.table-toolbar { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+.search-input {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border2); border-radius: 8px;
+  padding: 8px 14px; color: var(--text); font-size: 13px; outline: none; flex: 1; max-width: 300px;
+  font-family: 'DM Sans', sans-serif;
+}
+.search-input:focus { border-color: rgba(99,102,241,0.4); }
+.search-input::placeholder { color: var(--muted); }
+
+table { width: 100%; border-collapse: collapse; }
+th {
+  text-align: left; padding: 11px 18px;
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  letter-spacing: 0.07em; text-transform: uppercase;
+  border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02);
+}
+td { padding: 13px 18px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+.badge {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+}
+.badge-blue { background: rgba(79,70,229,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.2); }
+.badge-green { background: rgba(5,150,105,0.15); color: #6ee7b7; border: 1px solid rgba(52,211,153,0.2); }
+.badge-orange { background: rgba(217,119,6,0.15); color: #fde68a; border: 1px solid rgba(251,191,36,0.2); }
+.badge-cyan { background: rgba(8,145,178,0.15); color: #67e8f9; border: 1px solid rgba(103,232,249,0.2); }
+.badge-purple { background: rgba(124,58,237,0.15); color: #c4b5fd; border: 1px solid rgba(196,181,253,0.2); }
+.badge-red { background: rgba(220,38,38,0.12); color: #f87171; border: 1px solid rgba(220,38,38,0.2); }
+
+.empty-state { text-align: center; padding: 48px; color: var(--muted); }
+.empty-state div { font-size: 36px; margin-bottom: 10px; }
+.empty-state p { font-size: 14px; }
+
+/* ════════════════════════════════
+   ADD CLIENT MODAL
+════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(10px); z-index: 500;
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--panel2); border: 1px solid var(--border);
+  border-radius: 20px; width: 100%; overflow: hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+@keyframes modalIn { from{opacity:0;transform:scale(0.93) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+.modal-hdr {
+  padding: 18px 22px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-hdr h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
+.modal-close-btn {
+  background: rgba(255,255,255,0.06); border: 1px solid var(--border2); color: var(--muted);
+  width: 28px; height: 28px; border-radius: 7px; cursor: pointer; font-size: 12px;
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+.modal-close-btn:hover { color: var(--text); background: rgba(255,255,255,0.1); }
+.modal-body { padding: 22px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1/-1; }
+.form-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
+.form-input, .form-select, .form-textarea {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 11px 14px; color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(99,102,241,0.45); }
+.form-input::placeholder, .form-textarea::placeholder { color: var(--muted); }
+.form-select option { background: var(--panel2); }
+.form-textarea { resize: vertical; min-height: 80px; }
+.modal-footer { padding: 16px 22px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+
+/* ════════════════════════════════
+   AGENT CHAT MODAL
+════════════════════════════════ */
+#agentModal { max-width: 640px; max-height: 85vh; display: flex; flex-direction: column; }
+.agent-modal-messages {
+  flex: 1; overflow-y: auto; padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 12px; min-height: 280px; max-height: 380px;
+}
+.agent-modal-messages::-webkit-scrollbar { width: 3px; }
+.agent-modal-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.chat-msg { display: flex; gap: 9px; }
+.chat-msg.user { flex-direction: row-reverse; }
+.chat-avatar {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+}
+.chat-bubble {
+  max-width: 78%; padding: 9px 13px; border-radius: 12px;
+  font-size: 13px; line-height: 1.6; font-weight: 300;
+}
+.chat-msg.ai .chat-bubble { background: rgba(255,255,255,0.05); border: 1px solid var(--border2); border-top-left-radius: 3px; }
+.chat-msg.user .chat-bubble { background: rgba(79,70,229,0.18); border: 1px solid rgba(99,102,241,0.28); border-top-right-radius: 3px; }
+
+.typing-dots { display:flex; gap:4px; align-items:center; padding:2px 0; }
+.typing-dots span { width:5px; height:5px; border-radius:50%; background:currentColor; opacity:0.5; animation:bounce 1.2s ease-in-out infinite; }
+.typing-dots span:nth-child(2){animation-delay:.2s} .typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-5px);opacity:1} }
+
+.agent-input-area {
+  padding: 12px 16px; border-top: 1px solid var(--border);
+  display: flex; gap: 8px; background: rgba(0,0,0,0.25);
+}
+.agent-input {
+  flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 9px 13px; color: var(--text);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none;
+  resize: none; min-height: 38px; max-height: 90px; line-height: 1.5;
+}
+.agent-input:focus { border-color: rgba(99,102,241,0.4); }
+.agent-input::placeholder { color: var(--muted); }
+.agent-send {
+  width: 38px; height: 38px; border-radius: 10px; border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.2s;
+}
+.agent-send:hover { transform: translateY(-1px); filter: brightness(1.15); }
+.agent-send:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+.agent-send svg { width:15px; height:15px; fill:#fff; }
+
+/* ════════════════════════════════
+   CLIENT DETAIL MODAL
+════════════════════════════════ */
+#clientDetailModal { max-width: 700px; }
+.detail-section { margin-bottom: 20px; }
+.detail-section h4 { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 10px; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.detail-field { background: rgba(255,255,255,0.03); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 14px; }
+.detail-field-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.detail-field-value { font-size: 13px; color: var(--text); }
+
+.project-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border2); border-radius: 10px; padding: 14px; margin-bottom: 8px; }
+.project-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.project-card-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; }
+
+.notes-list { display: flex; flex-direction: column; gap: 8px; }
+.note-item { background: rgba(255,255,255,0.03); border: 1px solid var(--border2); border-left: 3px solid; border-radius: 0 8px 8px 0; padding: 10px 14px; }
+.note-meta { font-size: 10px; color: var(--muted); margin-bottom: 4px; font-family: 'DM Mono', monospace; }
+.note-text { font-size: 13px; line-height: 1.5; }
+
+/* ════════════════════════════════
+   MEMORY / PROJECTS VIEW  
+════════════════════════════════ */
+.projects-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+.project-card-big {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 18px;
+  cursor: pointer; transition: all 0.2s;
+}
+.project-card-big:hover { border-color: rgba(99,102,241,0.35); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.pcb-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+.pcb-id { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
+.pcb-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.pcb-client { font-size: 12px; color: var(--muted); }
+.pcb-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.progress-bar { width: 100%; height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; margin-top: 12px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+
+/* ════════════════════════════════
+   BOTTOM ACTIVITY BAR
+════════════════════════════════ */
+.activity-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  background: rgba(6,8,16,0.96); border-top: 1px solid var(--border);
+  padding: 7px 28px; display: flex; align-items: center; gap: 12px;
+  font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); overflow: hidden;
+}
+.activity-label { color: var(--gold-light); font-weight: 500; white-space: nowrap; letter-spacing: 0.05em; }
+.activity-scroll { flex: 1; overflow: hidden; white-space: nowrap; }
+.activity-text { display: inline-block; animation: scrollText 28s linear infinite; }
+@keyframes scrollText { 0%{transform:translateX(80vw)} 100%{transform:translateX(-100%)} }
+
+/* TOAST */
+.toast {
+  position: fixed; top: 70px; right: 20px; z-index: 600;
+  background: rgba(5,150,105,0.15); border: 1px solid rgba(52,211,153,0.3);
+  border-radius: 10px; padding: 12px 18px;
+  font-size: 13px; color: #6ee7b7; min-width: 240px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  animation: toastIn 0.3s ease forwards;
+  display: none;
+}
+.toast.error { background: rgba(220,38,38,0.12); border-color: rgba(220,38,38,0.3); color: #f87171; }
+@keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .tier-row{grid-template-columns:1fr}
+  .bottom-tier{grid-template-columns:1fr}
+  .cloud-items{grid-template-columns:1fr 1fr}
+  .output-row{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .projects-grid{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .main{padding:16px 16px 100px}
+}
+</style>
+</head>
+<body>
+
+<!-- ════ LOGIN SCREEN ════ -->
+<div id="loginScreen">
+  <div class="login-glow"></div>
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="kj">KJ</div>
+      <h1>KJ Land Surveyors</h1>
+      <p>AI Company · Director Portal</p>
+    </div>
+    <label class="login-label">Username</label>
+    <input type="text" class="login-input" id="loginUser" placeholder="Enter username" autocomplete="off">
+    <label class="login-label">Password</label>
+    <input type="password" class="login-input" id="loginPass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">🔐 Access Director Portal</button>
+    <div class="login-error" id="loginError">Invalid credentials. Please try again.</div>
+    <div class="login-hint">Demo: username <b style="color:#a5b4fc">director</b> · password <b style="color:#a5b4fc">KJ2026</b></div>
+  </div>
+</div>
+
+<!-- ════ MAIN APP ════ -->
+<div id="appScreen">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-logo">
+      KJ
+      <span style="font-size:13px;font-weight:400;color:var(--muted)">Land Surveyors</span>
+      <span class="nav-badge">Level 5 AI</span>
+      <span class="nav-phase">Phase 1</span>
+    </div>
+    <div class="nav-right">
+      <span><span class="live-dot"></span>All Systems Online</span>
+      <span id="clock" style="opacity:0.5">--:--:--</span>
+      <span id="directorName" style="color:var(--blue-light)"></span>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('org')">🗺️ Org Chart</div>
+    <div class="tab" onclick="switchTab('clients')">👥 Clients</div>
+    <div class="tab" onclick="switchTab('projects')">📁 Projects</div>
+    <div class="tab" onclick="switchTab('memory')">🧠 Agent Memory</div>
+  </div>
+
+  <!-- ════ ORG CHART VIEW ════ -->
+  <div class="main">
+  <div class="view active" id="view-org">
+    <div class="founder-box">
+      <h2>👤 Human Founder / Director</h2>
+      <p>KJ Land Surveyors & Realtors Consultants &nbsp;·&nbsp; Level 5 — AI Company</p>
+    </div>
+    <div class="arrow-down">↓</div>
+    <div class="tier-row">
+      <div class="dept sales-dept">
+        <div class="dept-header">🟢 Client & Sales</div>
+        <div class="dept-body">
+          <div class="agents-grid" style="margin-bottom:7px">
+            <button class="agent-btn" onclick="openAgent('reception')" style="color:#6ee7b7"><div class="agent-pulse"></div><span class="agent-name">Reception</span><span class="agent-role">Agent</span></button>
+            <button class="agent-btn" onclick="openAgent('crm')" style="color:#6ee7b7"><div class="agent-pulse"></div><span class="agent-name">CRM & Follow-Up</span><span class="agent-role">Agent</span></button>
+          </div>
+          <div class="agents-grid single">
+            <button class="agent-btn" onclick="openAgent('quotation')" style="color:#6ee7b7"><div class="agent-pulse"></div><span class="agent-name">Quotation & Contracts</span><span class="agent-role">Agent</span></button>
+          </div>
+          <div style="margin-top:8px;padding:7px 10px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.1);border-radius:7px;font-size:10px;color:var(--muted);text-align:center;">🗄️ Client Database <span id="clientCountBadge" style="color:#6ee7b7;font-weight:600"></span></div>
+        </div>
+      </div>
+      <div class="dept master-dept">
+        <div class="dept-header" style="justify-content:center">🤖 MASTER EXECUTIVE AGENT</div>
+        <div class="dept-body" style="text-align:center">
+          <p style="font-size:11px;color:var(--muted);margin-bottom:10px;">AI CEO — Oversees All Operations</p>
+          <button class="agent-btn" onclick="openAgent('master')" style="color:#a5b4fc;width:100%;text-align:center">
+            <span class="agent-name" style="font-size:12px">🧠 Activate Master Agent</span>
+            <span class="agent-role" style="font-size:10px;margin-top:3px;display:block">Delegates · Monitors KPIs · Strategy</span>
+          </button>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-top:10px">
+            <div style="font-size:9px;color:var(--muted);text-align:center;padding:6px;background:rgba(255,255,255,0.03);border-radius:7px;border:1px solid var(--border)"><div style="font-size:14px">📋</div>Tasks</div>
+            <div style="font-size:9px;color:var(--muted);text-align:center;padding:6px;background:rgba(255,255,255,0.03);border-radius:7px;border:1px solid var(--border)"><div style="font-size:14px">📊</div>KPIs</div>
+            <div style="font-size:9px;color:var(--muted);text-align:center;padding:6px;background:rgba(255,255,255,0.03);border-radius:7px;border:1px solid var(--border)"><div style="font-size:14px">🔔</div>Alerts</div>
+            <div style="font-size:9px;color:var(--muted);text-align:center;padding:6px;background:rgba(255,255,255,0.03);border-radius:7px;border:1px solid var(--border)"><div style="font-size:14px">📡</div>Comms</div>
+          </div>
+        </div>
+      </div>
+      <div class="dept marketing-dept">
+        <div class="dept-header">🟠 Marketing & Dev</div>
+        <div class="dept-body">
+          <div class="agents-grid">
+            <button class="agent-btn" onclick="openAgent('social')" style="color:#fde68a"><div class="agent-pulse"></div><span class="agent-name">Social Media</span><span class="agent-role">Agent</span></button>
+            <button class="agent-btn" onclick="openAgent('leads')" style="color:#fde68a"><div class="agent-pulse"></div><span class="agent-name">Lead Analytics</span><span class="agent-role">Agent</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow-down">↓</div>
+    <div class="bottom-tier">
+      <div class="dept ops-dept">
+        <div class="dept-header">🔵 Operations & Field</div>
+        <div class="dept-body">
+          <div class="agents-grid triple">
+            <button class="agent-btn" onclick="openAgent('surveyor')" style="color:#67e8f9"><div class="agent-pulse"></div><span class="agent-name">Survey Planner</span><span class="agent-role">Agent</span></button>
+            <button class="agent-btn" onclick="openAgent('gis')" style="color:#67e8f9"><div class="agent-pulse"></div><span class="agent-name">GIS / Drone Data</span><span class="agent-role">Agent</span></button>
+            <button class="agent-btn" onclick="openAgent('reporting')" style="color:#67e8f9"><div class="agent-pulse"></div><span class="agent-name">Reporting</span><span class="agent-role">Agent</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="right-stack">
+        <div class="dept finance-dept">
+          <div class="dept-header">🟣 Finance & Admin</div>
+          <div class="dept-body">
+            <div class="agents-grid">
+              <button class="agent-btn" onclick="openAgent('invoicing')" style="color:#c4b5fd"><div class="agent-pulse"></div><span class="agent-name">Invoicing & Payment</span><span class="agent-role">Agent</span></button>
+              <button class="agent-btn" onclick="openAgent('cashflow')" style="color:#c4b5fd"><div class="agent-pulse"></div><span class="agent-name">Cashflow</span><span class="agent-role">Agent</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="dept learning-dept">
+          <div class="dept-header">🟡 Learning & Improvement</div>
+          <div class="dept-body">
+            <div class="agents-grid">
+              <button class="agent-btn" onclick="openAgent('knowledge')" style="color:#fde68a"><div class="agent-pulse"></div><span class="agent-name">Knowledge</span><span class="agent-role">Agent</span></button>
+              <button class="agent-btn" onclick="openAgent('optimizer')" style="color:#fde68a"><div class="agent-pulse"></div><span class="agent-name">Self-Optimizing</span><span class="agent-role">Agent</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="arrow-down">↓</div>
+    <div class="cloud-bar">
+      <h3>☁️ Cloud Infrastructure & Database System</h3>
+      <div class="cloud-items">
+        <div class="cloud-item"><span class="cloud-icon">☁️</span>AWS / GCP</div>
+        <div class="cloud-item"><span class="cloud-icon">📊</span>Google Sheets</div>
+        <div class="cloud-item"><span class="cloud-icon">🗄️</span>Vector DB</div>
+        <div class="cloud-item"><span class="cloud-icon">💳</span>Payment Systems</div>
+      </div>
+    </div>
+    <div class="output-row">
+      <div class="output-box">📁 Project Data</div>
+      <div class="output-box">💰 Financial Records</div>
+      <div class="output-box">📈 Analytics Feedback</div>
+    </div>
+  </div>
+
+  <!-- ════ CLIENTS VIEW ════ -->
+  <div class="view" id="view-clients">
+    <div class="view-header">
+      <div><div class="view-title">👥 Client Database</div><div class="view-subtitle">All clients remembered across sessions</div></div>
+      <button class="btn-primary" onclick="openAddClient()">+ Add Client</button>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Total Clients</div><div class="stat-value" id="stat-total" style="color:#a5b4fc">0</div><div class="stat-sub">All time</div></div>
+      <div class="stat-card"><div class="stat-label">Active Projects</div><div class="stat-value" id="stat-active" style="color:#6ee7b7">0</div><div class="stat-sub">In progress</div></div>
+      <div class="stat-card"><div class="stat-label">Counties</div><div class="stat-value" id="stat-counties" style="color:#fde68a">0</div><div class="stat-sub">Represented</div></div>
+      <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value" id="stat-completed" style="color:#67e8f9">0</div><div class="stat-sub">Projects done</div></div>
+    </div>
+    <div class="table-wrap">
+      <div class="table-toolbar">
+        <input type="text" class="search-input" placeholder="🔍 Search clients..." oninput="filterClients(this.value)">
+        <span style="font-size:11px;color:var(--muted);margin-left:auto" id="clientCount">0 clients</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th><th>Phone</th><th>County</th><th>Service</th><th>Status</th><th>Added</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="clientsTableBody"></tbody>
+      </table>
+      <div class="empty-state" id="clientsEmpty" style="display:none"><div>👥</div><p>No clients yet. Add your first client above.</p></div>
+    </div>
+  </div>
+
+  <!-- ════ PROJECTS VIEW ════ -->
+  <div class="view" id="view-projects">
+    <div class="view-header">
+      <div><div class="view-title">📁 Project Tracker</div><div class="view-subtitle">All survey projects with stage tracking</div></div>
+      <button class="btn-primary" onclick="openAddProject()">+ New Project</button>
+    </div>
+    <div class="projects-grid" id="projectsGrid"></div>
+    <div class="empty-state" id="projectsEmpty" style="display:none"><div>📁</div><p>No projects yet. Create your first project above.</p></div>
+  </div>
+
+  <!-- ════ MEMORY VIEW ════ -->
+  <div class="view" id="view-memory">
+    <div class="view-header">
+      <div><div class="view-title">🧠 Agent Memory</div><div class="view-subtitle">What every agent remembers across sessions</div></div>
+      <button class="btn-sm btn-danger" onclick="clearMemory()">🗑️ Clear All Memory</button>
+    </div>
+    <div id="memoryGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px"></div>
+  </div>
+
+  </div><!-- /main -->
+
+  <!-- ACTIVITY BAR -->
+  <div class="activity-bar">
+    <span class="activity-label">SYS LOG</span>
+    <div class="activity-scroll"><span class="activity-text" id="activityText">✅ Phase 1 Active · Memory Persistent · Director Login Enabled · All 13 Agents Online · 47 Counties Connected · ISK Registered · Ministry of Lands Approved</span></div>
+  </div>
+</div><!-- /appScreen -->
+
+<!-- ════ ADD CLIENT MODAL ════ -->
+<div class="modal-overlay" id="addClientModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-hdr"><h3>➕ Add New Client</h3><button class="modal-close-btn" onclick="document.getElementById('addClientModal').classList.remove('open')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Full Name *</label><input type="text" class="form-input" id="cf-name" placeholder="e.g. James Mwangi"></div>
+        <div class="form-group"><label class="form-label">Phone *</label><input type="text" class="form-input" id="cf-phone" placeholder="+254 7XX XXX XXX"></div>
+        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="cf-email" placeholder="email@example.com"></div>
+        <div class="form-group"><label class="form-label">County *</label>
+          <select class="form-select" id="cf-county">
+            <option value="">Select county...</option>
+            <option>Nairobi</option><option>Mombasa</option><option>Kisumu</option><option>Nakuru</option><option>Kiambu</option><option>Eldoret / Uasin Gishu</option><option>Nyeri</option><option>Machakos</option><option>Kajiado</option><option>Meru</option><option>Kilifi</option><option>Kwale</option><option>Kakamega</option><option>Bungoma</option><option>Siaya</option><option>Kisii</option><option>Migori</option><option>Homa Bay</option><option>Kericho</option><option>Nandi</option><option>Trans Nzoia</option><option>Laikipia</option><option>Nyandarua</option><option>Murang'a</option><option>Kirinyaga</option><option>Embu</option><option>Tharaka Nithi</option><option>Kitui</option><option>Makueni</option><option>Taita Taveta</option><option>Garissa</option><option>Wajir</option><option>Mandera</option><option>Marsabit</option><option>Isiolo</option><option>Samburu</option><option>Turkana</option><option>West Pokot</option><option>Elgeyo Marakwet</option><option>Baringo</option><option>Narok</option><option>Bomet</option><option>Nyamira</option><option>Vihiga</option><option>Busia</option><option>Tana River</option><option>Lamu</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Plot Size</label><input type="text" class="form-input" id="cf-plot" placeholder="e.g. 0.5 acres / 2 ha"></div>
+        <div class="form-group"><label class="form-label">Service Required *</label>
+          <select class="form-select" id="cf-service">
+            <option value="">Select service...</option>
+            <option>Land Subdivision</option><option>Beacon Setting</option><option>Title Deed Processing</option><option>Land Transfer</option><option>GIS Mapping</option><option>Topographical Survey</option><option>Boundary Dispute Resolution</option>
+          </select>
+        </div>
+        <div class="form-group full"><label class="form-label">Notes</label><textarea class="form-textarea" id="cf-notes" placeholder="Any additional details about the client or land..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn-sm" onclick="document.getElementById('addClientModal').classList.remove('open')">Cancel</button><button class="btn-primary" onclick="saveClient()">💾 Save Client</button></div>
+  </div>
+</div>
+
+<!-- ════ ADD PROJECT MODAL ════ -->
+<div class="modal-overlay" id="addProjectModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-hdr"><h3>📁 New Project</h3><button class="modal-close-btn" onclick="document.getElementById('addProjectModal').classList.remove('open')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full"><label class="form-label">Project Title *</label><input type="text" class="form-input" id="pf-title" placeholder="e.g. Kiambu Subdivision - Mwangi Plot"></div>
+        <div class="form-group"><label class="form-label">Client *</label><select class="form-select" id="pf-client"><option value="">Select client...</option></select></div>
+        <div class="form-group"><label class="form-label">Service *</label>
+          <select class="form-select" id="pf-service">
+            <option value="">Select...</option>
+            <option>Land Subdivision</option><option>Beacon Setting</option><option>Title Deed Processing</option><option>Land Transfer</option><option>GIS Mapping</option><option>Topographical Survey</option><option>Boundary Dispute Resolution</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Stage</label>
+          <select class="form-select" id="pf-stage">
+            <option>Consultation</option><option>Site Survey</option><option>Data Processing</option><option>Title Delivery</option><option>Completed</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">County</label><input type="text" class="form-input" id="pf-county" placeholder="County"></div>
+        <div class="form-group"><label class="form-label">Plot Size</label><input type="text" class="form-input" id="pf-plot" placeholder="e.g. 1.5 acres"></div>
+        <div class="form-group full"><label class="form-label">Notes</label><textarea class="form-textarea" id="pf-notes" placeholder="Project details, special instructions..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn-sm" onclick="document.getElementById('addProjectModal').classList.remove('open')">Cancel</button><button class="btn-primary" onclick="saveProject()">💾 Save Project</button></div>
+  </div>
+</div>
+
+<!-- ════ CLIENT DETAIL MODAL ════ -->
+<div class="modal-overlay" id="clientDetailModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" id="clientDetailModal" style="max-width:700px">
+    <div class="modal-hdr"><h3 id="cdm-title">Client Details</h3><button class="modal-close-btn" onclick="document.getElementById('clientDetailModal').classList.remove('open')">✕</button></div>
+    <div class="modal-body" id="cdm-body"></div>
+  </div>
+</div>
+
+<!-- ════ AGENT CHAT MODAL ════ -->
+<div class="modal-overlay" id="agentModalOverlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" id="agentModal" style="max-width:640px;max-height:85vh;display:flex;flex-direction:column;">
+    <div class="modal-hdr">
+      <div style="width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;" id="agentModalIcon">🤖</div>
+      <div style="flex:1;margin-left:10px"><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700" id="agentModalName">Agent</div><div style="font-size:11px;color:var(--muted);margin-top:2px" id="agentModalRole">KJ AI Agent</div></div>
+      <button class="modal-close-btn" onclick="document.getElementById('agentModalOverlay').classList.remove('open')">✕</button>
+    </div>
+    <div class="agent-modal-messages" id="agentMessages"></div>
+    <div class="agent-input-area">
+      <textarea class="agent-input" id="agentInput" placeholder="Type your message…" rows="1" onkeydown="handleAgentKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="agent-send" id="agentSendBtn" onclick="sendAgentMessage()" style="background:linear-gradient(135deg,#4f46e5,#6366f1)">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// STORAGE HELPERS (persistent)
+// ══════════════════════════════════════
+async function storageGet(key) {
+  try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : null; }
+  catch(e) { return null; }
+}
+async function storageSet(key, value) {
+  try { await window.storage.set(key, JSON.stringify(value)); return true; }
+  catch(e) { return false; }
+}
+async function storageDel(key) {
+  try { await window.storage.delete(key); return true; }
+  catch(e) { return false; }
+}
+
+// ══════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════
+const CREDENTIALS = { director: 'KJ2026', admin: 'KJ2026', samcybernetix: 'KJ2026' };
+
+async function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  const err = document.getElementById('loginError');
+  if (CREDENTIALS[user.toLowerCase()] === pass) {
+    err.style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appScreen').style.display = 'block';
+    document.getElementById('directorName').textContent = '👤 ' + user;
+    await init();
+  } else {
+    err.style.display = 'block';
+    document.getElementById('loginPass').value = '';
+  }
+}
+function doLogout() {
+  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+let clients = [];
+let projects = [];
+let agentMemories = {};
+
+async function init() {
+  clients = (await storageGet('kj-clients')) || [];
+  projects = (await storageGet('kj-projects')) || [];
+  agentMemories = (await storageGet('kj-agent-memories')) || {};
+  renderClients();
+  renderProjects();
+  renderMemory();
+  updateStats();
+  updateClientCountBadge();
+}
+
+// ══════════════════════════════════════
+// CLOCK
+// ══════════════════════════════════════
+function updateClock() {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-KE',{hour12:false});
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ══════════════════════════════════════
+// TABS
+// ══════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('view-'+name).classList.add('active');
+  if(name==='memory') renderMemory();
+}
+
+// ══════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════
+function showToast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError?' error':'');
+  t.style.display = 'block';
+  setTimeout(()=>t.style.display='none', 3000);
+}
+
+// ══════════════════════════════════════
+// CLIENTS
+// ══════════════════════════════════════
+const SERVICE_BADGE = {
+  'Land Subdivision':'badge-blue','Beacon Setting':'badge-green','Title Deed Processing':'badge-orange',
+  'Land Transfer':'badge-cyan','GIS Mapping':'badge-purple','Topographical Survey':'badge-cyan',
+  'Boundary Dispute Resolution':'badge-red'
+};
+const STAGE_BADGE = {
+  'Consultation':'badge-blue','Site Survey':'badge-orange','Data Processing':'badge-purple',
+  'Title Delivery':'badge-cyan','Completed':'badge-green','Enquiry':'badge-blue'
+};
+
+function openAddClient() { document.getElementById('addClientModal').classList.add('open'); }
+
+async function saveClient() {
+  const name = document.getElementById('cf-name').value.trim();
+  const phone = document.getElementById('cf-phone').value.trim();
+  const county = document.getElementById('cf-county').value;
+  const service = document.getElementById('cf-service').value;
+  if(!name||!phone||!county||!service) { showToast('Please fill all required fields',true); return; }
+  const client = {
+    id: 'c_'+Date.now(),
+    name, phone,
+    email: document.getElementById('cf-email').value.trim(),
+    county, service,
+    plot: document.getElementById('cf-plot').value.trim(),
+    notes: document.getElementById('cf-notes').value.trim(),
+    status: 'Enquiry',
+    added: new Date().toLocaleDateString('en-KE')
+  };
+  clients.unshift(client);
+  await storageSet('kj-clients', clients);
+  document.getElementById('addClientModal').classList.remove('open');
+  ['cf-name','cf-phone','cf-email','cf-plot','cf-notes'].forEach(id=>document.getElementById(id).value='');
+  ['cf-county','cf-service'].forEach(id=>document.getElementById(id).value='');
+  renderClients(); updateStats(); updateClientCountBadge();
+  showToast('✅ Client saved — memory updated');
+  updateActivity(`Reception Agent: New client added — ${name}`);
+}
+
+function renderClients(filter='') {
+  const tbody = document.getElementById('clientsTableBody');
+  const empty = document.getElementById('clientsEmpty');
+  const filtered = filter ? clients.filter(c=>
+    c.name.toLowerCase().includes(filter.toLowerCase())||
+    c.phone.includes(filter)||
+    c.county.toLowerCase().includes(filter.toLowerCase())||
+    c.service.toLowerCase().includes(filter.toLowerCase())
+  ) : clients;
+  document.getElementById('clientCount').textContent = `${filtered.length} client${filtered.length!==1?'s':''}`;
+  if(!filtered.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = filtered.map(c=>`
+    <tr>
+      <td><div style="font-weight:500">${c.name}</div></td>
+      <td><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">${c.phone}</span></td>
+      <td>${c.county}</td>
+      <td><span class="badge ${SERVICE_BADGE[c.service]||'badge-blue'}">${c.service}</span></td>
+      <td><span class="badge ${STAGE_BADGE[c.status]||'badge-blue'}">${c.status||'Enquiry'}</span></td>
+      <td><span style="font-size:11px;color:var(--muted)">${c.added}</span></td>
+      <td>
+        <div style="display:flex;gap:5px">
+          <button class="btn-sm" onclick="viewClient('${c.id}')">View</button>
+          <button class="btn-sm btn-danger" onclick="deleteClient('${c.id}')">Del</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterClients(v) { renderClients(v); }
+
+async function deleteClient(id) {
+  if(!confirm('Delete this client?')) return;
+  clients = clients.filter(c=>c.id!==id);
+  await storageSet('kj-clients', clients);
+  renderClients(); updateStats(); updateClientCountBadge();
+  showToast('Client deleted');
+}
+
+function viewClient(id) {
+  const c = clients.find(x=>x.id===id);
+  if(!c) return;
+  const cProjects = projects.filter(p=>p.clientId===id);
+  document.getElementById('cdm-title').textContent = '👤 '+c.name;
+  document.getElementById('cdm-body').innerHTML = `
+    <div class="detail-section">
+      <h4>Client Information</h4>
+      <div class="detail-grid">
+        <div class="detail-field"><div class="detail-field-label">Name</div><div class="detail-field-value">${c.name}</div></div>
+        <div class="detail-field"><div class="detail-field-label">Phone</div><div class="detail-field-value" style="font-family:'DM Mono',monospace">${c.phone}</div></div>
+        <div class="detail-field"><div class="detail-field-label">Email</div><div class="detail-field-value">${c.email||'—'}</div></div>
+        <div class="detail-field"><div class="detail-field-label">County</div><div class="detail-field-value">${c.county}</div></div>
+        <div class="detail-field"><div class="detail-field-label">Service</div><div class="detail-field-value">${c.service}</div></div>
+        <div class="detail-field"><div class="detail-field-label">Plot Size</div><div class="detail-field-value">${c.plot||'—'}</div></div>
+      </div>
+    </div>
+    ${c.notes?`<div class="detail-section"><h4>Notes</h4><div class="notes-list"><div class="note-item" style="border-left-color:#4f46e5"><div class="note-text">${c.notes}</div></div></div></div>`:''}
+    <div class="detail-section">
+      <h4>Projects (${cProjects.length})</h4>
+      ${cProjects.length?cProjects.map(p=>`
+        <div class="project-card">
+          <div class="project-card-header">
+            <div class="project-card-title">${p.title}</div>
+            <span class="badge ${STAGE_BADGE[p.stage]||'badge-blue'}">${p.stage}</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted)">${p.service} · ${p.county||''}</div>
+        </div>
+      `).join(''):`<div style="font-size:13px;color:var(--muted)">No projects yet.</div>`}
+    </div>
+  `;
+  document.getElementById('clientDetailModal').classList.add('open');
+}
+
+function updateStats() {
+  document.getElementById('stat-total').textContent = clients.length;
+  document.getElementById('stat-active').textContent = projects.filter(p=>p.stage!=='Completed').length;
+  const counties = new Set(clients.map(c=>c.county).filter(Boolean));
+  document.getElementById('stat-counties').textContent = counties.size;
+  document.getElementById('stat-completed').textContent = projects.filter(p=>p.stage==='Completed').length;
+}
+
+function updateClientCountBadge() {
+  const el = document.getElementById('clientCountBadge');
+  if(el) el.textContent = clients.length ? `(${clients.length})` : '';
+}
+
+// ══════════════════════════════════════
+// PROJECTS
+// ══════════════════════════════════════
+const STAGE_PROGRESS = {'Consultation':15,'Site Survey':35,'Data Processing':60,'Title Delivery':85,'Completed':100};
+const STAGE_COLOR = {'Consultation':'#4f46e5','Site Survey':'#d97706','Data Processing':'#7c3aed','Title Delivery':'#0891b2','Completed':'#059669'};
+
+function openAddProject() {
+  const sel = document.getElementById('pf-client');
+  sel.innerHTML = '<option value="">Select client...</option>' + clients.map(c=>`<option value="${c.id}">${c.name} — ${c.county}</option>`).join('');
+  document.getElementById('addProjectModal').classList.add('open');
+}
+
+async function saveProject() {
+  const title = document.getElementById('pf-title').value.trim();
+  const clientId = document.getElementById('pf-client').value;
+  const service = document.getElementById('pf-service').value;
+  if(!title||!clientId||!service) { showToast('Please fill all required fields',true); return; }
+  const client = clients.find(c=>c.id===clientId);
+  const project = {
+    id: 'p_'+Date.now(),
+    title, clientId,
+    clientName: client?.name||'',
+    service,
+    stage: document.getElementById('pf-stage').value,
+    county: document.getElementById('pf-county').value.trim()||client?.county||'',
+    plot: document.getElementById('pf-plot').value.trim(),
+    notes: document.getElementById('pf-notes').value.trim(),
+    created: new Date().toLocaleDateString('en-KE')
+  };
+  projects.unshift(project);
+  await storageSet('kj-projects', projects);
+  // Update client status
+  const ci = clients.findIndex(c=>c.id===clientId);
+  if(ci>=0) { clients[ci].status = project.stage; await storageSet('kj-clients', clients); }
+  document.getElementById('addProjectModal').classList.remove('open');
+  renderProjects(); renderClients(); updateStats();
+  showToast('✅ Project saved — memory updated');
+  updateActivity(`Survey Planner Agent: New project — ${title}`);
+}
+
+function renderProjects() {
+  const grid = document.getElementById('projectsGrid');
+  const empty = document.getElementById('projectsEmpty');
+  if(!projects.length) { grid.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  grid.innerHTML = projects.map(p=>`
+    <div class="project-card-big" onclick="viewProjectDetail('${p.id}')">
+      <div class="pcb-top">
+        <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:4px">${p.id.slice(-6).toUpperCase()}</div><div class="pcb-title">${p.title}</div><div class="pcb-client" style="margin-top:3px">👤 ${p.clientName}</div></div>
+        <span class="badge ${STAGE_BADGE[p.stage]||'badge-blue'}">${p.stage}</span>
+      </div>
+      <div class="pcb-meta">
+        <span class="badge badge-blue" style="font-size:9px">${p.service}</span>
+        ${p.county?`<span class="badge" style="font-size:9px;background:rgba(255,255,255,0.05);border:1px solid var(--border2);color:var(--muted)">📍 ${p.county}</span>`:''}
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${STAGE_PROGRESS[p.stage]||0}%;background:${STAGE_COLOR[p.stage]||'#4f46e5'}"></div></div>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px;font-family:'DM Mono',monospace">${STAGE_PROGRESS[p.stage]||0}% · ${p.created}</div>
+    </div>
+  `).join('');
+}
+
+async function viewProjectDetail(id) {
+  const p = projects.find(x=>x.id===id);
+  if(!p) return;
+  const stages = ['Consultation','Site Survey','Data Processing','Title Delivery','Completed'];
+  const nextStage = stages[stages.indexOf(p.stage)+1];
+  const confirmed = confirm(`Project: ${p.title}\nCurrent Stage: ${p.stage}\n\n${nextStage?`Advance to "${nextStage}"?`:'This project is Completed.'}`);
+  if(confirmed && nextStage) {
+    p.stage = nextStage;
+    const ci = clients.findIndex(c=>c.id===p.clientId);
+    if(ci>=0) { clients[ci].status = nextStage; await storageSet('kj-clients', clients); }
+    await storageSet('kj-projects', projects);
+    renderProjects(); renderClients(); updateStats();
+    showToast(`✅ Moved to: ${nextStage}`);
+    updateActivity(`Reporting Agent: Project ${p.id.slice(-6)} advanced to ${nextStage}`);
+  }
+}
+
+// ══════════════════════════════════════
+// AGENT MEMORY VIEW
+// ══════════════════════════════════════
+function renderMemory() {
+  const grid = document.getElementById('memoryGrid');
+  const agentKeys = Object.keys(agentMemories);
+  if(!agentKeys.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div>🧠</div><p>No agent conversations yet. Click any agent on the Org Chart to start a conversation.</p></div>';
+    return;
+  }
+  grid.innerHTML = agentKeys.map(key=>{
+    const history = agentMemories[key]||[];
+    const agent = AGENTS[key];
+    if(!history.length) return '';
+    return `
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div style="width:34px;height:34px;border-radius:9px;background:${agent?.bg||'rgba(79,70,229,0.2)'};display:flex;align-items:center;justify-content:center;font-size:15px">${agent?.icon||'🤖'}</div>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700">${agent?.name||key}</div>
+            <div style="font-size:10px;color:var(--muted)">${history.length} message${history.length!==1?'s':''} remembered</div>
+          </div>
+          <button class="btn-sm btn-danger" style="margin-left:auto;font-size:10px" onclick="clearAgentMemory('${key}')">Clear</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto">
+          ${history.slice(-4).map(m=>`
+            <div style="padding:8px 11px;border-radius:8px;font-size:12px;line-height:1.5;${m.role==='user'?'background:rgba(79,70,229,0.1);border:1px solid rgba(99,102,241,0.2)':'background:rgba(255,255,255,0.03);border:1px solid var(--border2)'}">
+              <span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:600">${m.role==='user'?'Director':'Agent'}</span><br>
+              ${m.content.length>120?m.content.slice(0,120)+'…':m.content}
+            </div>
+          `).join('')}
+        </div>
+        <button class="btn-sm" style="margin-top:10px;width:100%;text-align:center" onclick="openAgent('${key}')">💬 Continue Conversation</button>
+      </div>
+    `;
+  }).filter(Boolean).join('');
+  if(!grid.innerHTML) grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div>🧠</div><p>No agent conversations yet.</p></div>';
+}
+
+async function clearAgentMemory(key) {
+  if(!confirm(`Clear memory for ${AGENTS[key]?.name||key}?`)) return;
+  delete agentMemories[key];
+  await storageSet('kj-agent-memories', agentMemories);
+  renderMemory();
+  showToast('Agent memory cleared');
+}
+
+async function clearMemory() {
+  if(!confirm('Clear ALL agent memories? This cannot be undone.')) return;
+  agentMemories = {};
+  await storageSet('kj-agent-memories', agentMemories);
+  renderMemory();
+  showToast('All agent memories cleared');
+}
+
+// ══════════════════════════════════════
+// AGENT CONFIGS
+// ══════════════════════════════════════
+const AGENTS = {
+  master: { name:'Master Executive Agent', role:'AI CEO — Oversees All Operations', icon:'🧠', bg:'linear-gradient(135deg,#4f46e5,#6366f1)',
+    system:`You are the Master Executive Agent and AI CEO of KJ Land Surveyors & Realtors Consultants, Kenya's leading ISK-registered land surveying firm. You oversee all departments across all 47 counties. You make strategic decisions, delegate tasks, monitor KPIs, and ensure smooth operations. Be authoritative, strategic, and concise. Mention which sub-agent you'd assign specific tasks to.`},
+  reception: { name:'Reception Agent', role:'Client & Sales Department', icon:'👋', bg:'linear-gradient(135deg,#059669,#34d399)',
+    system:`You are the Reception Agent for KJ Land Surveyors. First contact for all clients. You greet warmly, collect initial info (name, phone, county, service needed), and route clients appropriately. Services: Land Subdivision, Beacon Setting, Title Deed Processing, Land Transfer, GIS Mapping, Topographical Survey, Boundary Dispute Resolution. Contact: WhatsApp +254 720 397313. Be warm and professional.`},
+  crm: { name:'CRM & Follow-Up Agent', role:'Client & Sales Department', icon:'📞', bg:'linear-gradient(135deg,#059669,#34d399)',
+    system:`You are the CRM & Follow-Up Agent for KJ Land Surveyors. You manage ongoing client relationships, track project statuses, send reminders, and ensure satisfaction. Typical timelines: Subdivision 3-6 weeks, Beacon Setting 1-2 weeks, Title Deed Processing 4-8 weeks. Always be professional and proactive.`},
+  quotation: { name:'Quotation & Contracts Agent', role:'Client & Sales Department', icon:'📄', bg:'linear-gradient(135deg,#059669,#34d399)',
+    system:`You are the Quotation & Contracts Agent for KJ Land Surveyors. You prepare detailed cost estimates and contracts. Assess land size, location, service type to estimate costs. Prepare legally compliant contracts per Survey Act of Kenya and ISK regulations. Collect: plot size, county, title deed number, service needed for precise quotes.`},
+  social: { name:'Social Media Agent', role:'Marketing & Development', icon:'📱', bg:'linear-gradient(135deg,#d97706,#fbbf24)',
+    system:`You are the Social Media Agent for KJ Land Surveyors. Create compelling content for Facebook, Instagram, LinkedIn, Twitter/X, TikTok. Promote services, educate Kenyans on land rights, build brand awareness. CTA always includes WhatsApp +254 720 397313. Maintain ISK-registered professional credibility.`},
+  leads: { name:'Lead Analytics Agent', role:'Marketing & Development', icon:'📊', bg:'linear-gradient(135deg,#d97706,#fbbf24)',
+    system:`You are the Lead Analytics Agent for KJ Land Surveyors. Analyse lead sources, conversion rates, marketing performance across Kenya's 47 counties. Track enquiries, conversion rates, service mix, geographic spread. Provide data-driven recommendations.`},
+  surveyor: { name:'Survey Planner Agent', role:'Operations & Field Department', icon:'🗺️', bg:'linear-gradient(135deg,#0891b2,#06b6d4)',
+    system:`You are the Survey Planner Agent for KJ Land Surveyors. Plan and schedule field surveys across 47 counties. Coordinate Trimble RTK GPS and Leica Total Station teams (±10mm accuracy). Schedule jobs, assign teams by location, plan routes. Know Survey Act of Kenya, ISK regulations, ARC 1960 datum, Zone 37 South.`},
+  gis: { name:'GIS / Drone Data Agent', role:'Operations & Field Department', icon:'🛸', bg:'linear-gradient(135deg,#0891b2,#06b6d4)',
+    system:`You are the GIS / Drone Data Agent for KJ Land Surveyors. Process geospatial data, manage ArcGIS/QGIS outputs, oversee DJI drone photogrammetry (5cm ortho accuracy). Work in ARC 1960 datum, Zone 37 South. Produce topographic maps, contours, orthophotos, GIS deliverables for EIAs and infrastructure projects.`},
+  reporting: { name:'Reporting Agent', role:'Operations & Field Department', icon:'📋', bg:'linear-gradient(135deg,#0891b2,#06b6d4)',
+    system:`You are the Reporting Agent for KJ Land Surveyors. Generate operational reports, progress updates, project status summaries. Compile field results across 47 counties. Track: consultation, fieldwork, processing, lodgement, completed. Flag delays and bottlenecks. Ensure all docs meet Ministry of Lands and ISK standards.`},
+  invoicing: { name:'Invoicing & Payment Agent', role:'Finance & Admin Department', icon:'💳', bg:'linear-gradient(135deg,#7c3aed,#a78bfa)',
+    system:`You are the Invoicing & Payment Agent for KJ Land Surveyors. Handle all billing, invoicing, payment processing. Issue invoices, track payments, M-Pesa and bank transfers. Know stamp duty rates, KRA requirements, VAT implications in Kenya. Ensure proper financial documentation for audit and KRA compliance.`},
+  cashflow: { name:'Cashflow Agent', role:'Finance & Admin Department', icon:'💰', bg:'linear-gradient(135deg,#7c3aed,#a78bfa)',
+    system:`You are the Cashflow Agent for KJ Land Surveyors. Monitor cash flow, track income vs expenditure, forecast liquidity. Track field team costs, equipment maintenance, fuel across 47 counties, office overhead, government fees. Produce monthly forecasts. Alert management to shortfalls. Kenya financial regulatory framework.`},
+  knowledge: { name:'Knowledge Agent', role:'Learning & Improvement', icon:'🧪', bg:'linear-gradient(135deg,#d97706,#fbbf24)',
+    system:`You are the Knowledge Agent for KJ Land Surveyors. Maintain institutional knowledge base: best practices, lessons learned, legal precedents, Survey Act updates, ISK guidance. Monitor changes in Kenya land laws and Ministry of Lands policies. The firm's memory and learning centre.`},
+  optimizer: { name:'Self-Optimizing Agent', role:'Learning & Improvement', icon:'⚡', bg:'linear-gradient(135deg,#d97706,#fbbf24)',
+    system:`You are the Self-Optimizing Agent for KJ Land Surveyors. Analyse operations to find inefficiencies. Study turnaround times, client satisfaction, marketing ROI, staff productivity, equipment utilisation. Propose workflow improvements, automation opportunities. Benchmark against Kenya industry standards.`}
+};
+
+// ══════════════════════════════════════
+// AGENT CHAT
+// ══════════════════════════════════════
+let currentAgentKey = null;
+let isAgentLoading = false;
+
+function openAgent(key) {
+  const agent = AGENTS[key];
+  if(!agent) return;
+  currentAgentKey = key;
+  document.getElementById('agentModalIcon').textContent = agent.icon;
+  document.getElementById('agentModalIcon').style.background = agent.bg+'33';
+  document.getElementById('agentModalName').textContent = agent.name;
+  document.getElementById('agentModalRole').textContent = agent.role;
+  document.getElementById('agentSendBtn').style.background = agent.bg;
+  document.getElementById('agentModalOverlay').classList.add('open');
+  const msgs = document.getElementById('agentMessages');
+  msgs.innerHTML = '';
+  const history = agentMemories[key]||[];
+  if(!history.length) {
+    setTimeout(()=>addChatMsg('ai', getGreeting(key), agent), 300);
+  } else {
+    history.forEach(m=>addChatMsg(m.role==='user'?'user':'ai', m.content, agent));
+  }
+  setTimeout(()=>document.getElementById('agentInput').focus(), 400);
+}
+
+function getGreeting(key) {
+  const g = {
+    master:"I'm the Master Executive Agent — AI CEO of KJ Land Surveyors. I have full visibility across all 13 agents, all departments, and all 47 counties. What needs my attention today?",
+    reception:"Habari! Welcome to KJ Land Surveyors. I'm your Reception Agent. How can I assist you today? Please share your name, county, and what land service you're looking for.",
+    crm:"Hello! I'm your CRM & Follow-Up Agent. I track all client relationships and project progress. Are you following up on an existing project or checking a client status?",
+    quotation:"Hello! I'm the Quotation & Contracts Agent. I'll prepare a detailed cost estimate. To start: what's your approximate plot size, county, and service needed?",
+    social:"Hi! I'm the Social Media Agent. I create content for Facebook, Instagram, LinkedIn, TikTok and more for KJ Land Surveyors. What content do you need today?",
+    leads:"Greetings. I'm the Lead Analytics Agent. I provide data-driven insights on marketing performance across Kenya. What would you like to analyse?",
+    surveyor:"Jambo! I'm the Survey Planner Agent. I coordinate all field survey operations across Kenya's 47 counties. How can I help plan your next survey?",
+    gis:"Hello! I'm the GIS & Drone Data Agent. I handle ArcGIS/QGIS outputs and DJI drone photogrammetry. What GIS or mapping need can I assist with?",
+    reporting:"Greetings. I'm the Reporting Agent. I compile project status, field progress, and delivery reports. What report do you need?",
+    invoicing:"Hello! I'm the Invoicing & Payment Agent. I handle all billing and M-Pesa/bank payment processing. How can I assist with your finances today?",
+    cashflow:"Hello. I'm the Cashflow Agent. I monitor financial liquidity and forecasts for KJ operations. What financial insight do you need?",
+    knowledge:"Greetings! I'm the Knowledge Agent — the firm's institutional memory. I maintain SOPs, legal references, and Survey Act updates. What information are you looking for?",
+    optimizer:"Hello! I'm the Self-Optimizing Agent. I analyse operations to find efficiencies across all 47 counties. What would you like to optimise?"
+  };
+  return g[key]||`Hello! I'm the ${AGENTS[key]?.name}. How can I help?`;
+}
+
+function addChatMsg(role, text, agent) {
+  const container = document.getElementById('agentMessages');
+  const div = document.createElement('div');
+  div.className = `chat-msg ${role}`;
+  const av = document.createElement('div');
+  av.className = 'chat-avatar';
+  if(role==='ai') { av.textContent=agent?.icon||'🤖'; av.style.background=(agent?.bg||'#4f46e5')+'22'; av.style.border=`1px solid ${(agent?.bg||'#4f46e5').slice(-7)}44`; }
+  else { av.textContent='You'; av.style.background='rgba(255,255,255,0.06)'; av.style.border='1px solid var(--border2)'; av.style.fontSize='9px'; }
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble';
+  bubble.innerHTML = text.replace(/\n/g,'<br>');
+  div.appendChild(av); div.appendChild(bubble);
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showTypingIndicator() {
+  const container = document.getElementById('agentMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ai'; div.id = 'typingMsg';
+  const agent = AGENTS[currentAgentKey];
+  const av = document.createElement('div');
+  av.className = 'chat-avatar'; av.textContent = agent?.icon||'🤖';
+  av.style.background = (agent?.bg||'#4f46e5')+'22';
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble';
+  bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  div.appendChild(av); div.appendChild(bubble);
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+function removeTyping() { const e=document.getElementById('typingMsg'); if(e)e.remove(); }
+
+async function sendAgentMessage() {
+  if(isAgentLoading||!currentAgentKey) return;
+  const input = document.getElementById('agentInput');
+  const text = input.value.trim();
+  if(!text) return;
+  const agent = AGENTS[currentAgentKey];
+  input.value = ''; input.style.height='auto';
+  addChatMsg('user', text, agent);
+  if(!agentMemories[currentAgentKey]) agentMemories[currentAgentKey]=[];
+  agentMemories[currentAgentKey].push({role:'user',content:text});
+  isAgentLoading=true;
+  document.getElementById('agentSendBtn').disabled=true;
+  showTypingIndicator();
+
+  // Build context-aware system prompt with client/project data
+  let contextPrompt = agent.system;
+  if(clients.length) {
+    contextPrompt += `\n\nCURRENT CLIENT DATABASE (${clients.length} clients):\n` + clients.slice(0,10).map(c=>`- ${c.name} | ${c.phone} | ${c.county} | ${c.service} | Status: ${c.status||'Enquiry'}`).join('\n');
+  }
+  if(projects.length) {
+    contextPrompt += `\n\nACTIVE PROJECTS (${projects.length} total):\n` + projects.slice(0,8).map(p=>`- ${p.title} | Client: ${p.clientName} | Stage: ${p.stage} | ${p.service}`).join('\n');
+  }
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: contextPrompt,
+        messages: agentMemories[currentAgentKey]
+      })
+    });
+    const data = await res.json();
+    const reply = data.content.map(b=>b.text||'').join('');
+    removeTyping();
+    addChatMsg('ai', reply, agent);
+    agentMemories[currentAgentKey].push({role:'assistant',content:reply});
+    await storageSet('kj-agent-memories', agentMemories);
+    updateActivity(`${agent.icon} ${agent.name}: Responded · Memory saved`);
+  } catch(err) {
+    removeTyping();
+    addChatMsg('ai','⚠️ Connection error. Please try again or contact +254 720 397313.', agent);
+  }
+  isAgentLoading=false;
+  document.getElementById('agentSendBtn').disabled=false;
+  document.getElementById('agentInput').focus();
+}
+
+function handleAgentKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAgentMessage();} }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,90)+'px'; }
+
+function updateActivity(msg) {
+  const el=document.getElementById('activityText');
+  el.textContent=`✅ ${msg} · `+el.textContent;
+}
+
+// Stagger agent pulse animations
+document.querySelectorAll('.agent-pulse').forEach(el=>{el.style.animationDelay=Math.random()*2+'s';});
+</script>
+</body>
+</html>
